@@ -1,4 +1,6 @@
 import os
+import time
+import random
 
 def completions_create(client, messages: list, model: str) -> str:
     """
@@ -12,6 +14,9 @@ def completions_create(client, messages: list, model: str) -> str:
     Returns:
         str: The content of the model's response.
     """
+    # Sleep for a random time between 0.5 and 3 seconds
+    sleep_time = random.uniform(0.5, 3.0)
+    time.sleep(sleep_time)
     response = client.chat.completions.create(messages=messages, model=model)
     return str(response.choices[0].message.content)
 
@@ -94,6 +99,7 @@ if __name__ == "__main__":
     
     from openai import OpenAI
     from dotenv import load_dotenv
+    import random
     load_dotenv()
 
     client = OpenAI(

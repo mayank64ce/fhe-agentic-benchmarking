@@ -176,7 +176,9 @@ class ReactAgent:
 
                 update_chat_history(chat_history, completion, "assistant")
 
-                print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
+                if thought.found:
+                    # print the thought
+                    print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
 
                 if tool_calls.found:
                     observations = self.process_tool_calls(tool_calls.content)

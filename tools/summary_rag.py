@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import List, Optional
 
-from langchain.document_loaders import JSONLoader
+from langchain_community.document_loaders import JSONLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class SignatureRAG:
+class SummaryRAG:
     """
     Simple RAG over TFHE summaries to fetch method signatures.
     Expects JSON of the form:
@@ -128,7 +128,7 @@ class SignatureRAG:
 
 
 if __name__ == "__main__":
-    rag = SignatureRAG(
+    rag = SummaryRAG(
         summary_db_path="../tfhe_documentation/summaries_db.json",
         embedding_model="text-embedding-3-small",
         persist_directory="./chroma_tfhe_summaries",

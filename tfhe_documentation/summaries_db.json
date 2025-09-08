@@ -1,0 +1,173 @@
+{
+    "summaries": [
+      {
+        "method_signature": "TFheGateBootstrappingParameterSet* new_default_gate_bootstrapping_parameters(int minimum_lambda);",
+        "summary": "Generate default gate bootstrapping parameters with a given minimum security level."
+      },
+      {
+        "method_signature": "void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet* params);",
+        "summary": "Export the TFHE gate bootstrapping parameter set to a file."
+      },
+      {
+        "method_signature": "void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& F, const TFheGateBootstrappingParameterSet* params);",
+        "summary": "Export the TFHE gate bootstrapping parameter set to an output stream."
+      },
+      {
+        "method_signature": "TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F);",
+        "summary": "Read and construct a TFHE gate bootstrapping parameter set from a file."
+      },
+      {
+        "method_signature": "TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& F);",
+        "summary": "Read and construct a TFHE gate bootstrapping parameter set from a stream."
+      },
+      {
+        "method_signature": "void delete_gate_bootstrapping_parameters(TFheGateBootstrappingParameterSet* params);",
+        "summary": "Delete and free a TFHE gate bootstrapping parameter set."
+      },
+      {
+        "method_signature": "void tfhe_random_generator_setSeed(uint32_t* values, int size);",
+        "summary": "Seed the TFHE random number generator with an array of values."
+      },
+      {
+        "method_signature": "TFheGateBootstrappingSecretKeySet* new_random_gate_bootstrapping_secret_keyset(const TFheGateBootstrappingParameterSet* params);",
+        "summary": "Generate a new random TFHE gate bootstrapping secret key set."
+      },
+      {
+        "method_signature": "void export_tfheGateBootstrappingSecretKeySet_toFile(FILE* F, const TFheGateBootstrappingSecretKeySet* keyset);",
+        "summary": "Export the TFHE gate bootstrapping secret key set to a file."
+      },
+      {
+        "method_signature": "void export_tfheGateBootstrappingSecretKeySet_toStream(std::ostream& F, const TFheGateBootstrappingSecretKeySet* keyset);",
+        "summary": "Export the TFHE gate bootstrapping secret key set to an output stream."
+      },
+      {
+        "method_signature": "TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromFile(FILE* F);",
+        "summary": "Read and construct a TFHE gate bootstrapping secret key set from a file."
+      },
+      {
+        "method_signature": "TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromStream(std::istream& F);",
+        "summary": "Read and construct a TFHE gate bootstrapping secret key set from a stream."
+      },
+      {
+        "method_signature": "void delete_gate_bootstrapping_secret_keyset(TFheGateBootstrappingSecretKeySet* keyset);",
+        "summary": "Delete and free a TFHE gate bootstrapping secret key set."
+      },
+      {
+        "method_signature": "void export_tfheGateBootstrappingCloudKeySet_toFile(FILE* F, const TFheGateBootstrappingCloudKeySet* cloudKeyset);",
+        "summary": "Export the TFHE gate bootstrapping cloud key set to a file."
+      },
+      {
+        "method_signature": "void export_tfheGateBootstrappingCloudKeySet_toStream(std::ostream& F, const TFheGateBootstrappingCloudKeySet* cloudKeyset);",
+        "summary": "Export the TFHE gate bootstrapping cloud key set to an output stream."
+      },
+      {
+        "method_signature": "TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromFile(FILE* F);",
+        "summary": "Read and construct a TFHE gate bootstrapping cloud key set from a file."
+      },
+      {
+        "method_signature": "TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromStream(std::istream& F);",
+        "summary": "Read and construct a TFHE gate bootstrapping cloud key set from a stream."
+      },
+      {
+        "method_signature": "void delete_gate_bootstrapping_cloud_keyset(TFheGateBootstrappingCloudKeySet* cloudKeyset);",
+        "summary": "Delete and free a TFHE gate bootstrapping cloud key set."
+      },
+      {
+        "method_signature": "LweSample* new_gate_bootstrapping_ciphertext(const TFheGateBootstrappingParameterSet* params);",
+        "summary": "Generate a new uninitialized TFHE gate bootstrapping ciphertext."
+      },
+      {
+        "method_signature": "LweSample* new_gate_bootstrapping_ciphertext_array(int nbelems, const TFheGateBootstrappingParameterSet* params);",
+        "summary": "Generate a new array of uninitialized TFHE gate bootstrapping ciphertexts."
+      },
+      {
+        "method_signature": "void delete_gate_bootstrapping_ciphertext(LweSample* sample);",
+        "summary": "Delete and free a TFHE gate bootstrapping ciphertext."
+      },
+      {
+        "method_signature": "void delete_gate_bootstrapping_ciphertext_array(int nbelems, LweSample* samples);",
+        "summary": "Delete and free an array of TFHE gate bootstrapping ciphertexts."
+      },
+      {
+        "method_signature": "void export_gate_bootstrapping_ciphertext_toFile(FILE* F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
+        "summary": "Export a TFHE gate bootstrapping ciphertext to a file."
+      },
+      {
+        "method_signature": "void export_gate_bootstrapping_ciphertext_toStream(std::ostream& F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
+        "summary": "Export a TFHE gate bootstrapping ciphertext to an output stream."
+      },
+      {
+        "method_signature": "void import_gate_bootstrapping_ciphertext_fromFile(FILE* F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
+        "summary": "Read and import a TFHE gate bootstrapping ciphertext from a file."
+      },
+      {
+        "method_signature": "void import_gate_bootstrapping_ciphertext_fromStream(std::istream& F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
+        "summary": "Read and import a TFHE gate bootstrapping ciphertext from a stream."
+      },
+      {
+        "method_signature": "void bootsSymEncrypt(LweSample* result, int message, const TFheGateBootstrappingSecretKeySet* params);",
+        "summary": "Encrypt a boolean value into a TFHE gate bootstrapping ciphertext using the secret key set."
+      },
+      {
+        "method_signature": "int bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* params);",
+        "summary": "Decrypt a TFHE gate bootstrapping ciphertext back into a boolean value using the secret key set."
+      },
+      {
+        "method_signature": "void bootsCONSTANT(LweSample* result, int value, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped constant gate: encrypts a constant boolean value (true or false)."
+      },
+      {
+        "method_signature": "void bootsNOT(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped NOT gate: computes the negation of input ciphertext a."
+      },
+      {
+        "method_signature": "void bootsCOPY(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped COPY gate: copies ciphertext a into result."
+      },
+      {
+        "method_signature": "void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped NAND gate: computes NOT(a AND b)."
+      },
+      {
+        "method_signature": "void bootsOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped OR gate: computes a OR b."
+      },
+      {
+        "method_signature": "void bootsAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped AND gate: computes a AND b."
+      },
+      {
+        "method_signature": "void bootsXOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped XOR gate: computes a XOR b."
+      },
+      {
+        "method_signature": "void bootsXNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped XNOR gate: computes a == b."
+      },
+      {
+        "method_signature": "void bootsNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped NOR gate: computes NOT(a OR b)."
+      },
+      {
+        "method_signature": "void bootsANDNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped AND-NY gate: computes NOT(a) AND b."
+      },
+      {
+        "method_signature": "void bootsANDYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped AND-YN gate: computes a AND NOT(b)."
+      },
+      {
+        "method_signature": "void bootsORNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped OR-NY gate: computes NOT(a) OR b."
+      },
+      {
+        "method_signature": "void bootsORYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped OR-YN gate: computes a OR NOT(b)."
+      },
+      {
+        "method_signature": "void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* bk);",
+        "summary": "Bootstrapped multiplexer gate: computes (a ? b : c)."
+      }
+    ]
+  }
+  

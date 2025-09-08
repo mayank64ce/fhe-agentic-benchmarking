@@ -19,16 +19,20 @@ class Compiler:
     def __init__(self, save_dir):
         self.save_dir = save_dir
 
-    def compile(self, code: str) -> str:
+    def compile(self, code: str, cpp_file: str=None) -> str:
         # first save the code
-        cpp_file = f"{self.save_dir}/program.cpp"
-        exe_file = f"{self.save_dir}/program"
-        save_code_to_file(code, cpp_file)
+        if cpp_file is None:
+            cpp_file = f"{self.save_dir}/program.c"
+            exe_file = f"{self.save_dir}/program"
+            save_code_to_file(code, cpp_file)
+        else:
+            exe_file = cpp_file.replace(".c", "")
+        
         # then compile the code
         try:
             # Compile the code
             result = subprocess.run(
-                ["g++", cpp_file, "-o", exe_file],
+                ["g++", cpp_file, "-o", exe_file, "-ltfhe-spqlios-fma"],
                 capture_output=True,
                 text=True,
                 check=False

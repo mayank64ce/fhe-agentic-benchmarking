@@ -7,10 +7,10 @@ class Executor:
     """
     A simplified class to execute C++ code on test cases.
     """
-    def __init__(self, save_dir, test_dir):
+    def __init__(self, save_dir, test_dir, task="program"):
         self.save_dir = Path(save_dir)
         self.test_dir = Path(test_dir)
-        self.executable = self.save_dir / "program"
+        self.executable = self.save_dir / task
     
     def execute(self) -> str:
         """

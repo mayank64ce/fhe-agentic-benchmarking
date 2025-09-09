@@ -32,7 +32,7 @@ class Compiler:
         try:
             # Compile the code
             result = subprocess.run(
-                ["g++", cpp_file, "-o", exe_file, "-ltfhe-spqlios-fma"],
+                ["g++", cpp_file, "-o", exe_file, "-I/usr/local/include", "-L/usr/local/lib","-ltfhe-spqlios-fma"],
                 capture_output=True,
                 text=True,
                 check=False

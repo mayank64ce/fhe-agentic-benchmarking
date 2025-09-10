@@ -1,10 +1,13 @@
 import sys
 import os
+import json
 sys.path.append("..")  # Add the parent directory to the sys.path
 from promptml.parser import PromptParser
 from jinja2 import Template
 from agents.utils.completions import completions_create, ChatHistory, build_prompt_structure
 from agents.utils.extraction import extract_tag_content
+from prompts import system_prompt_intent_extraction, system_prompt_dafny_conversion
+from le import get_lambda
 from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
@@ -33,7 +36,7 @@ Make sure to follow the below instructions:
     - {{ instr }}
 {% endfor %}
 
-{{ parsed_prompt.objective }}"""
+TASK: {{ parsed_prompt.objective }}"""
 
     template = Template(template_str)
     rendered_prompt = template.render(parsed_prompt=prompt)
@@ -80,13 +83,13 @@ def convert_to_formal_prompt(intent: str, dafny_code: str, code_reqs: str) -> st
     return formal_prompt
 
 
-def convert_intent_and_final_spec_to_dafny_and_code_reqs(intent: str, final_spec: str, model: str) -> tuple[str, str]:
+def convert_intent_and_final_spec_to_dafny_and_code_reqs(intent: str, final_spec: str | dict, model: str) -> tuple[str, str]:
     """
     Converts user intent and final specification into Dafny code and informal code requirements.
 
     Args:
         intent (str): The user's intent.
-        final_spec (str): The final specification.
+        final_spec (str | dict): The final specification.
         model (str): The model to be used for the conversion.
 
     Returns:
@@ -95,53 +98,7 @@ def convert_intent_and_final_spec_to_dafny_and_code_reqs(intent: str, final_spec
     # 1. Get the intent and the final specification
     # 2. Pass them into an LLM.
 
-    system_prompt = """You are an expert Dafny programmer and formal verification specialist. Your task is to receive an `intent` and `specifications` from the user and generate a Dafny-like code implementation along with its formal requirements.
-
-You **MUST** format your response using the following tags. Do not include any introductory text, explanations, or conversational filler outside of the provided tags.
-
-1.  Enclose the human-readable requirements within `<requirements>` and `</requirements>` XML tags. This description should be formatted with markdown and explicitly list preconditions, postconditions, and any other relevant specifications.
-2.  Enclose the complete, syntactically correct Dafny-like code within a `<dafny_code>` and `</dafny_code>` XML block.
-
----
-
-### Example
-
-**User Input:**
-`Intent`: A method to find the maximum value in an array of integers.
-`Specifications`: The array must not be empty.
-
-**Your Expected Output:**
-
-<requirements>
-### Method: Max
-
-**Preconditions:**
-* `requires a.Length > 0`: The input array `a` must not be empty.
-
-**Postconditions:**
-* `ensures exists i :: 0 <= i < a.Length && max == a[i]`: The returned value `max` must be an element that exists within the array `a`.
-* `ensures forall j :: 0 <= j < a.Length ==> a[j] <= max`: Every element in the array `a` must be less than or equal to the returned value `max`.
-</requirements>
-<dafny_code>
-method Max(a: array<int>) returns (max: int)
-  requires a.Length > 0
-  ensures exists i :: 0 <= i < a.Length && max == a[i]
-  ensures forall j :: 0 <= j < a.Length ==> a[j] <= max
-{
-  max := a[0];
-  var i := 1;
-  while i < a.Length
-    invariant 0 < i <= a.Length
-    invariant exists k :: 0 <= k < i && max == a[k]
-    invariant forall j :: 0 <= j < i ==> a[j] <= max
-  {
-    if a[i] > max {
-      max := a[i];
-    }
-    i := i + 1;
-  }
-}
-</dafny_code>""".strip() # Change this
+    system_prompt = system_prompt_dafny_conversion
 
     chat_history = ChatHistory(
         [
@@ -157,6 +114,7 @@ method Max(a: array<int>) returns (max: int)
     Final Specification: {final_spec}
     """.strip()
 
+    # breakpoint()
     chat_history.append(
         build_prompt_structure(
             prompt=user_prompt,
@@ -172,7 +130,6 @@ method Max(a: array<int>) returns (max: int)
 
     dafny_code = extract_tag_content(str(content), "dafny_code")
     code_reqs = extract_tag_content(str(content), "requirements")
-
     return dafny_code, code_reqs
 
 
@@ -184,10 +141,21 @@ def complete_spec(partial_spec: str | dict) -> str | dict:
         partial_spec (str | dict): The partial specification to be completed.
 
     Returns:
-        str | dict: The completed specification.
+        str | dict: The completed specification. This will only contain lambda.
     """
 
-    return partial_spec # change this
+    # 1. if partial_spec has lambda, just keep lambda and return
+    if partial_spec.get("minimum_lambda") is not None:
+        return {"minimum_lambda": partial_spec["minimum_lambda"]}
+    # 2. Otherwise, fill in the missing parameters using defaults from lattice estimator
+    n = partial_spec.get("n", 630)
+    xs_sigma = partial_spec.get("xs_sigma", 0.5)
+    xs_mu = partial_spec.get("xs_mu", 0.5)
+    xe_sigma = partial_spec.get("xe_sigma", 131072.0)
+    xe_mu = partial_spec.get("xe_mu", 0.0)
+    lambda_val = get_lambda(n=n, xs_sigma=xs_sigma, xs_mu=xs_mu, xe_sigma=xe_sigma, xe_mu=xe_mu)
+    # 3. run the lattice estimator to get the new lambda
+    return {'minimum_lambda': lambda_val} # change this
 
 
 def extract_intent_and_spec(user_prompt: str, model: str) -> tuple[str, str | dict]:
@@ -203,52 +171,7 @@ def extract_intent_and_spec(user_prompt: str, model: str) -> tuple[str, str | di
     """
     # 1. Get the user prompt
     # 2. The LLM will generate the intent and final specification.
-    system_prompt = """You are an expert AI assistant specializing in analyzing programming requests. Your only job is to deconstruct a user's prompt into a primary **`intent`** and a set of technical **`specifications`**.
-
-- The **`intent`** is the core programming task or the function's main purpose (e.g., "Sort an array of integers," "Validate a user's email address").
-- The **`specifications`** are all the technical constraints, requirements for edge cases, language choice, or specific implementation details that the code must follow.
-
-You **MUST** format your response using the following XML-style tags. Do not include any text or explanations outside of these tags.
-
-1.  The `intent` must be enclosed in `<intent>` and `</intent>` tags.
-2.  All specifications, as a complete block of text, must be enclosed within `<specifications>` and `</specifications>` tags. Use bullet points for multiple specifications. If there are no specifications mentioned in the user prompt, the block **should** be empty.
-
----
-
-### Examples
-
-**User Prompt 1:**
-"Write a javascript function to check if a number is prime. If the input isn't a positive integer, it should throw an error."
-
-**Your Expected Output:**
-```xml
-<intent>Check if a number is prime</intent>
-<specifications>
-- The function must be written in JavaScript
-- Should throw an error if the input is not a positive integer
-</specifications>
-```
-
-**User Prompt 2:**
-"I need a C++ class for a Min-Heap data structure.
-
-**Your Expected Output:**
-```xml
-<intent>Create a class for a Min-Heap data structure</intent>
-<specifications>
-- The class must be written in C++
-</specifications>
-```
-
-**User Prompt 3:**
-"Reverse a string."
-
-**Your Expected Output:**
-```xml
-<intent>Reverse a string</intent>
-<specifications>
-</specifications>
-```""".strip()
+    system_prompt = system_prompt_intent_extraction
 
     chat_history = ChatHistory(
         [
@@ -272,7 +195,17 @@ You **MUST** format your response using the following XML-style tags. Do not inc
     intent = extract_tag_content(str(content), "intent")
     specifications = extract_tag_content(str(content), "specifications")
 
-    return intent, specifications
+    # make specifications a dictionary
+        # 4. Convert the specification string to a dictionary
+    spec_dict = {}
+    if specifications.found:
+        try:
+            spec_dict = json.loads(specifications.content[0])
+        except json.JSONDecodeError:
+            print("Warning: LLM output for specifications was not valid JSON.")
+            pass
+    # breakpoint()
+    return intent, spec_dict
 
 
 def test_convert_to_formal_prompt():
@@ -294,10 +227,10 @@ method funbar(a: int, b: int) returns (result: int)
 
 
 def test_convert_intent_and_final_spec_to_dafny_and_code_reqs():
-    intent = "I want to calculate the funbar of two numbers a and b."
-    final_spec = """
-    The funbar of two numbers a and b is defined as: (a + b) + (a * b)
-    """
+    intent = "Write C code to bitwise AND 2 integers."
+    final_spec = {
+        'minimum_lambda': 128,
+    }
     model = "deepseek/deepseek-chat-v3.1:free"
     dafny_code, code_reqs = convert_intent_and_final_spec_to_dafny_and_code_reqs(intent, final_spec, model)
     print("Dafny Code:")
@@ -310,13 +243,14 @@ def test_convert_intent_and_final_spec_to_dafny_and_code_reqs():
 def test_extract_intent_and_spec():
     # user_prompt = "Write a javascript function to check if a number is prime. If the input isn't a positive integer, it should throw an error."
     user_prompt = "Summarize this documentation for me."
+    user_prompt = "Write me a C code to bitwise XOR 2 integers. I want the 256-bit security and secret distibution should have 0 mean and unit variance."
     model = "deepseek/deepseek-chat-v3.1:free"
     intent, specifications = extract_intent_and_spec(user_prompt, model)
     print("Intent:")
     print(intent.content[0])
     print()
     print("Final Specification:")
-    print(specifications.content[0])
+    print(specifications)
 
 # Bringing it all together
 
@@ -335,14 +269,15 @@ def formalize_user_prompt(user_prompt: str, model: str) -> str:
     # 2. Complete the incomplete specification if needed
     final_spec = complete_spec(final_spec)
     # 3. Get dafny code and reqs from intent and final spec
-    dafny_code, code_reqs = convert_intent_and_final_spec_to_dafny_and_code_reqs(intent.content[0], final_spec.content[0], model)
+    dafny_code, code_reqs = convert_intent_and_final_spec_to_dafny_and_code_reqs(intent.content[0], final_spec, model)
     # 4. Combine them into a formal prompt
     formal_prompt = convert_to_formal_prompt(intent.content[0], dafny_code.content[0], code_reqs.content[0])
     return formal_prompt
 
 
 def test_formalize_user_prompt():
-    user_prompt = "Write a javascript function to check if a number is prime. If the input isn't a positive integer, it should throw an error."
+    # user_prompt = "Write a javascript function to check if a number is prime. If the input isn't a positive integer, it should throw an error."
+    user_prompt = "Write me a TFHE C code to bitwise XOR 2 integers. The security parameter should be at least 150 bits."
     model = "deepseek/deepseek-chat-v3.1:free"
     formal_prompt = formalize_user_prompt(user_prompt, model)
     print("User Prompt:",'\n', user_prompt)
@@ -350,9 +285,24 @@ def test_formalize_user_prompt():
     print("Formal Prompt:")
     print(formal_prompt)
 
+
+def test_complete_spec():
+    partial_spec = {
+        'n': 750,
+        'xs_sigma': 0.5,
+        'xs_mu': 0.5,
+        'xe_sigma': 131072.0,
+        'xe_mu': 0.0
+    }
+    completed_spec = complete_spec(partial_spec)
+    print("Completed Specification:")
+    print(completed_spec)
+
+
 if __name__ == "__main__":
     # test_convert_to_formal_prompt()
     # test_convert_intent_and_final_spec_to_dafny_and_code_reqs()
     # test_extract_intent_and_spec()
     test_formalize_user_prompt()
+    # test_complete_spec()
     pass

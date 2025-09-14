@@ -1,7 +1,7 @@
 import re
-from lattice_estimator.estimator import *
-from lattice_estimator.estimator.lwe_parameters import LWEParameters
-from lattice_estimator.estimator.nd import DiscreteGaussianAlpha, DiscreteGaussian
+from .lattice_estimator.estimator import *
+from .lattice_estimator.estimator.lwe_parameters import LWEParameters
+from .lattice_estimator.estimator.nd import DiscreteGaussianAlpha, DiscreteGaussian
 from sage.all import Infinity
 import math
 

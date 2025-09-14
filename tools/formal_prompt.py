@@ -6,8 +6,8 @@ from promptml.parser import PromptParser
 from jinja2 import Template
 from agents.utils.completions import completions_create, ChatHistory, build_prompt_structure
 from agents.utils.extraction import extract_tag_content
-from prompts import system_prompt_intent_extraction, system_prompt_dafny_conversion
-from le import get_lambda
+from .prompts import system_prompt_intent_extraction, system_prompt_dafny_conversion
+from .le import get_lambda
 from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
@@ -67,12 +67,38 @@ def convert_to_formal_prompt(intent: str, dafny_code: str, code_reqs: str) -> st
 
     @instructions 
         @step
+            The input will always come from the user.
+        @end
+        @step
+            Code should not have any extra logging or print statements.
+        @end
+        @step
+            Code should not be a basic C program, it should use TFHE library functions.
+        @end
+        @step
+            The TFHE header files to include are:
+                #include <tfhe/tfhe.h>
+                #include <tfhe/tfhe_io.h>
+        @end
+        @step
+            Code should have `assert` statements to implement the `ensure` and `requires` statements in the Dafny code.
+        @end
+        @step
             Follow the following Dafny-like code as a pseudo-code.
             {dafny_code}
         @end
         @step
             Follow the following informal code requirements strictly.
             {code_reqs}
+        @end
+        @step
+            Code should follow the following structure:
+            1. Setup Parameters
+            2. Key Generation
+            3. Encryption of inputs
+            4. Homomorphic Operations
+            5. Decryption of the result
+            6. Print the result
         @end
     @end
 @end"""
@@ -83,7 +109,7 @@ def convert_to_formal_prompt(intent: str, dafny_code: str, code_reqs: str) -> st
     return formal_prompt
 
 
-def convert_intent_and_final_spec_to_dafny_and_code_reqs(intent: str, final_spec: str | dict, model: str) -> tuple[str, str]:
+def convert_intent_and_final_spec_to_dafny_and_code_reqs(intent: str, final_spec: str | dict, model: str, seed: int = 0) -> tuple[str, str]:
     """
     Converts user intent and final specification into Dafny code and informal code requirements.
 
@@ -91,6 +117,7 @@ def convert_intent_and_final_spec_to_dafny_and_code_reqs(intent: str, final_spec
         intent (str): The user's intent.
         final_spec (str | dict): The final specification.
         model (str): The model to be used for the conversion.
+        seed (int): The seed for the model to ensure reproducibility.
 
     Returns:
         tuple[str, str]: A tuple containing the Dafny code and informal code requirements.
@@ -123,7 +150,7 @@ def convert_intent_and_final_spec_to_dafny_and_code_reqs(intent: str, final_spec
     )
 
     # 3. The LLM will generate the Dafny code and informal code requirements.
-    content = completions_create(client, chat_history, model)
+    content = completions_create(client, chat_history, model, seed)
     # 4. Parse the LLM output to get the Dafny code and informal code requirements.
 
     # print(content)
@@ -145,26 +172,29 @@ def complete_spec(partial_spec: str | dict) -> str | dict:
     """
 
     # 1. if partial_spec has lambda, just keep lambda and return
+    # breakpoint()
     if partial_spec.get("minimum_lambda") is not None:
         return {"minimum_lambda": partial_spec["minimum_lambda"]}
     # 2. Otherwise, fill in the missing parameters using defaults from lattice estimator
-    n = partial_spec.get("n", 630)
-    xs_sigma = partial_spec.get("xs_sigma", 0.5)
-    xs_mu = partial_spec.get("xs_mu", 0.5)
-    xe_sigma = partial_spec.get("xe_sigma", 131072.0)
-    xe_mu = partial_spec.get("xe_mu", 0.0)
+    n = partial_spec.get("n") or 630
+    xs_sigma = partial_spec.get("xs_sigma") or 0.5
+    xs_mu = partial_spec.get("xs_mu") or 0.5
+    xe_sigma = partial_spec.get("xe_sigma") or 131072.0
+    xe_mu = partial_spec.get("xe_mu") or 0.0
+    # breakpoint()
     lambda_val = get_lambda(n=n, xs_sigma=xs_sigma, xs_mu=xs_mu, xe_sigma=xe_sigma, xe_mu=xe_mu)
     # 3. run the lattice estimator to get the new lambda
     return {'minimum_lambda': lambda_val} # change this
 
 
-def extract_intent_and_spec(user_prompt: str, model: str) -> tuple[str, str | dict]:
+def extract_intent_and_spec(user_prompt: str, model: str, seed: int=0) -> tuple[str, str | dict]:
     """
     Extracts user intent and final specification from a user prompt.
 
     Args:
         user_prompt (str): The user's prompt.
         model (str): The model to be used for extraction.
+        seed (int): The seed for the model to ensure reproducibility.
 
     Returns:
         tuple[str, str | dict]: A tuple containing the user's intent and final specification.
@@ -189,7 +219,7 @@ def extract_intent_and_spec(user_prompt: str, model: str) -> tuple[str, str | di
         )
     )
 
-    content = completions_create(client, chat_history, model)
+    content = completions_create(client, chat_history, model, seed)
     # print(content)
     # 3. Parse the LLM output to get the intent and final specification.
     intent = extract_tag_content(str(content), "intent")
@@ -254,7 +284,7 @@ def test_extract_intent_and_spec():
 
 # Bringing it all together
 
-def formalize_user_prompt(user_prompt: str, model: str) -> str:
+def formalize_user_prompt(user_prompt: str, model: str, seed: int = 0) -> str:
     """
     Formalizes a user prompt into a formal prompt using Dafny code and informal code requirements.
     Args:
@@ -265,11 +295,11 @@ def formalize_user_prompt(user_prompt: str, model: str) -> str:
     """
 
     # 1. Extract intent and final specification from the user prompt
-    intent, final_spec = extract_intent_and_spec(user_prompt, model)
+    intent, final_spec = extract_intent_and_spec(user_prompt, model, seed)
     # 2. Complete the incomplete specification if needed
     final_spec = complete_spec(final_spec)
     # 3. Get dafny code and reqs from intent and final spec
-    dafny_code, code_reqs = convert_intent_and_final_spec_to_dafny_and_code_reqs(intent.content[0], final_spec, model)
+    dafny_code, code_reqs = convert_intent_and_final_spec_to_dafny_and_code_reqs(intent.content[0], final_spec, model, seed)
     # 4. Combine them into a formal prompt
     formal_prompt = convert_to_formal_prompt(intent.content[0], dafny_code.content[0], code_reqs.content[0])
     return formal_prompt
@@ -297,6 +327,48 @@ def test_complete_spec():
     completed_spec = complete_spec(partial_spec)
     print("Completed Specification:")
     print(completed_spec)
+
+def save_formal_prompt(task_name: str, informal_prompt: str, model: str, run_id: int, json_path: str):
+    """
+    Computes the formal prompt and saves it in a JSON file under the key:
+    dictionary[task_name][formal_prompt_{run_id}] = formal_prompt
+    
+    Args:
+        task_name (str): The name of the task.
+        informal_prompt (str): The user's informal prompt.
+        model (str): The model identifier to use for formalization.
+        run_id (int): The specific run ID for this formalization.
+        json_path (str): The path to the output JSON file.
+    """
+    # Step 1: Compute the formal prompt by calling the provided function.
+    # The default seed value (0) will be used.
+    formal_prompt = formalize_user_prompt(informal_prompt, model, seed=run_id)
+    
+    # Step 2: Read existing data from the JSON file.
+    # If the file doesn't exist or is empty, initialize an empty dictionary.
+    data = {}
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, 'r') as f:
+                data = json.load(f)
+        except json.JSONDecodeError:
+            # File is empty or malformed, proceed with an empty dictionary.
+            pass
+
+    # Step 3: Update the dictionary with the new formal prompt.
+    # Ensure the sub-dictionary for the task_name exists.
+    if task_name not in data:
+        data[task_name] = {}
+        
+    # Create the key for this specific run and assign the formal prompt.
+    key = f"formal_prompt_{run_id}"
+    data[task_name][key] = formal_prompt
+    
+    # Step 4: Write the updated dictionary back to the JSON file.
+    # 'indent=4' ensures the JSON is pretty-printed and human-readable.
+    with open(json_path, 'w') as f:
+        json.dump(data, f, indent=4)
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,57 @@
+User Prompt: 
+ Write me a TFHE C code to bitwise XOR 2 integers. The security parameter should be at least 150 bits.
+
+Formal Prompt:
+You are an expert coding agent familiar with cryptographic concepts.
+
+Make sure to follow the below instructions:
+
+    - The input will always come from the user.
+
+    - Code should not have any extra logging or print statements.
+
+    - Code should have `assert` statements to implement the `ensure` and `requires` statements in the Dafny code.
+
+    - Follow the following Dafny-like code as a pseudo-code.
+            // Global security parameter for TFHE cryptographic operations
+const minimum_lambda: int := 150;
+
+method Main(a: bv32, b: bv32) returns (result: bv32)
+  // Postcondition: The result is the correct XOR of the inputs
+  ensures result == (a ^ b)
+{
+  // Perform the bitwise XOR operation (modeling the TFHE computation)
+  result := a ^ b;
+  
+  // Verify cryptographic properties: XOR is reversible
+  assert result ^ a == b;
+  assert result ^ b == a;
+  
+  // Additional verification: XOR with zero returns original value
+  assert a ^ 0bv32 == a;
+  assert b ^ 0bv32 == b;
+}
+
+    - Follow the following informal code requirements strictly.
+            ### TFHE Bitwise XOR Implementation (Dafny Model)
+
+This program models the security context and functional correctness of a TFHE-based bitwise XOR operation on encrypted integers.
+
+**Security Context:**
+* A global constant, `minimum_lambda`, is set to 150, representing the required security parameter for the TFHE scheme. This value defines the cryptographic strength of the homomorphic encryption.
+
+**Functional Correctness:**
+* The `Main` method takes two 32-bit integers, `a` and `b`, representing the plaintext inputs that would be encrypted in a real TFHE implementation.
+* It proves the fundamental algebraic property of the XOR operation: that applying XOR twice with the same value returns the original value.
+* The assertions formally verify that the XOR operation is reversible and correct, which is essential for cryptographic operations.
+
+    - Code should follow the following structure:
+            1. Setup Parameters
+            2. Key Generation
+            3. Encryption of inputs
+            4. Homomorphic Operations
+            5. Decryption of the result
+            6. Print the result
+
+
+TASK: Write TFHE C code to bitwise XOR 2 integers

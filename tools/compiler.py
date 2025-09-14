@@ -19,13 +19,15 @@ class Compiler:
     def __init__(self, save_dir):
         self.save_dir = save_dir
 
-    def compile(self, code: str, cpp_file: str=None) -> str:
+    def compile(self, code: str=None, cpp_file: str=None) -> str:
         # first save the code
         if cpp_file is None:
             cpp_file = f"{self.save_dir}/program.c"
             exe_file = f"{self.save_dir}/program"
             save_code_to_file(code, cpp_file)
         else:
+            with open(cpp_file, "r") as f:
+                code = f.read()
             exe_file = cpp_file.replace(".c", "")
         
         # then compile the code

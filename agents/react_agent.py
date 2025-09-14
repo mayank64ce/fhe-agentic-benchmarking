@@ -75,6 +75,8 @@ class ReactAgent:
         tools: Tool | list[Tool],
         model: str = "llama-3.3-70b-versatile",
         system_prompt: str = BASE_SYSTEM_PROMPT,
+        seed : int = 42,
+        logger = None,
     ) -> None:
         self.client = OpenAI(
             base_url = "https://openrouter.ai/api/v1",
@@ -84,6 +86,8 @@ class ReactAgent:
         self.system_prompt = system_prompt
         self.tools = tools if isinstance(tools, list) else [tools]
         self.tools_dict = {tool.name: tool for tool in self.tools}
+        self.seed = seed
+        self.logger = logger
 
     def add_tool_signatures(self) -> str:
         """
@@ -110,16 +114,20 @@ class ReactAgent:
             tool_name = tool_call["name"]
             tool = self.tools_dict[tool_name]
 
-            print(Fore.GREEN + f"\nUsing Tool: {tool_name}")
+            if self.logger:
+                self.logger.info(Fore.GREEN + f"\nUsing Tool: {tool_name}")
 
             # Validate and execute the tool call
             validated_tool_call = validate_arguments(
                 tool_call, json.loads(tool.fn_signature)
             )
-            print(Fore.GREEN + f"\nTool call dict: \n{validated_tool_call}")
+
+            # print(Fore.GREEN + f"\nTool call dict: \n{validated_tool_call}")
 
             result = tool.run(**validated_tool_call["arguments"])
-            print(Fore.GREEN + f"\nTool result: \n{result}")
+
+            if self.logger:
+                self.logger.info(Fore.GREEN + f"\nTool result: \n{result}")
 
             # Store the result using the tool call ID
             observations[validated_tool_call["id"]] = result
@@ -165,7 +173,7 @@ class ReactAgent:
             # Run the ReAct loop for max_rounds
             for _ in range(max_rounds):
 
-                completion = completions_create(self.client, chat_history, self.model)
+                completion = completions_create(self.client, chat_history, self.model, self.seed)
 
                 response = extract_tag_content(str(completion), "response")
                 if response.found:
@@ -178,11 +186,15 @@ class ReactAgent:
 
                 if thought.found:
                     # print the thought
-                    print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
+                    if self.logger:
+                        self.logger.info(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
+                    # print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
 
                 if tool_calls.found:
                     observations = self.process_tool_calls(tool_calls.content)
-                    print(Fore.BLUE + f"\nObservations: {observations}")
+                    if self.logger:
+                        self.logger.info(Fore.BLUE + f"\nObservations: {observations}")
+                    # print(Fore.BLUE + f"\nObservations: {observations}")
                     update_chat_history(chat_history, f"{observations}", "user")
 
-        return completions_create(self.client, chat_history, self.model)
+        return completions_create(self.client, chat_history, self.model, seed=self.seed)

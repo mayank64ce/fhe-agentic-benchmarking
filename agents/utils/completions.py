@@ -2,7 +2,7 @@ import os
 import time
 import random
 
-def completions_create(client, messages: list, model: str) -> str:
+def completions_create(client, messages: list, model: str, seed: int = 0) -> str:
     """
     Sends a request to the client's `completions.create` method to interact with the language model.
 
@@ -17,7 +17,7 @@ def completions_create(client, messages: list, model: str) -> str:
     # Sleep for a random time between 0.5 and 3 seconds
     sleep_time = random.uniform(0.5, 3.0)
     time.sleep(sleep_time)
-    response = client.chat.completions.create(messages=messages, model=model)
+    response = client.chat.completions.create(messages=messages, model=model, seed=seed)
     return str(response.choices[0].message.content)
 
 

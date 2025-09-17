@@ -45,7 +45,7 @@ class Compiler:
         if result.returncode == 0:
             return "Compilation successful."
         else:
-            return f"Compilation failed: {result.stderr[:50]}"
+            return f"Compilation failed: {result.stderr[:150]}"
         
         # Check compilation result
         

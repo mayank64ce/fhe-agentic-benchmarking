@@ -46,7 +46,8 @@ parser.add_argument("--run_id", type=int, default=0, help="Run ID for the experi
 args = parser.parse_args()
 
 # define agent
-model = "deepseek/deepseek-chat-v3.1:free"
+# model = "deepseek/deepseek-chat-v3.1:free"
+model = "qwen/qwen-2.5-72b-instruct:free"
 
 # initialize save directory here
 save_dir = os.path.join("logs", model.split("/")[1].replace(":", "_").replace("-", "_"), 'task_and', str(args.run_id))

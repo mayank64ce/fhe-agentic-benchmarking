@@ -41,4 +41,4 @@ def evaluate_security_over_runs(
 
 
 if __name__ == "__main__":
-    evaluate_security_over_runs("logs_zscot")
+    evaluate_security_over_runs("logs_formal_secure_rag_mod")

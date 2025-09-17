@@ -174,7 +174,7 @@ class ReactAgent:
             for _ in range(max_rounds):
 
                 completion = completions_create(self.client, chat_history, self.model, self.seed)
-
+                
                 response = extract_tag_content(str(completion), "response")
                 if response.found:
                     return response.content[0]
@@ -183,7 +183,6 @@ class ReactAgent:
                 tool_calls = extract_tag_content(str(completion), "tool_call")
 
                 update_chat_history(chat_history, completion, "assistant")
-
                 if thought.found:
                     # print the thought
                     if self.logger:

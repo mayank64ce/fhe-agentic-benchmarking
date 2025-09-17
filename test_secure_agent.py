@@ -7,6 +7,7 @@ import os
 import logging
 from tools.compiler import Compiler
 from tools.executor import Executor
+from tools.security_check import check_secure
 from argparse import ArgumentParser
 from prompts import task_and_prompts
 
@@ -47,20 +48,15 @@ args = parser.parse_args()
 
 # define agent
 # model = "deepseek/deepseek-chat-v3.1:free"
-# model = "qwen/qwen3-coder"
-# model = "qwen/qwen-2.5-72b-instruct:free"
-# model = "qwen/qwen3-235b-a22b:free"
-# model = "openai/gpt-4o-2024-11-20"
-# model = "meta-llama/llama-4-maverick:free"
-model = "openai/gpt-3.5-turbo"
+model = "qwen/qwen-2.5-72b-instruct:free"
 
 # initialize save directory here
-save_dir = os.path.join("logs_formal_mod", model.split("/")[1].replace(":", "_").replace("-", "_"), 'task_and', str(args.run_id))
+save_dir = os.path.join("logs_secure", model.split("/")[1].replace(":", "_").replace("-", "_"), 'task_and', str(args.run_id))
 
 os.makedirs(save_dir, exist_ok=True)
-
 # print(save_dir)
 logger = get_logger(save_dir)
+
 
 
 test_dir = "unit_tests/task_and"
@@ -69,12 +65,12 @@ compiler = Compiler(save_dir=save_dir)
 executor = Executor(save_dir=save_dir, test_dir=test_dir)
 
 @tool
-def compile_execute_code(code: str) -> str:
+def compile_execute_secure_code(code: str) -> str:
     """
-    Compiles the given C file and executes it on the test cases.
+    Compiles the given C file and executes it on the test cases. After that, it runs a security check on the code.
 
     Args:
-        code (str): The C++ code to compile and execute.
+        code (str): The C code to compile and execute.
     
     Returns:
         str: Success message if both compilation and execution are successful, error message otherwise.
@@ -82,16 +78,27 @@ def compile_execute_code(code: str) -> str:
     compile_result = compiler.compile(code)
     if "Compilation successful" in compile_result:
         execute_result = executor.execute()
-        return execute_result
+        if "successfully" in execute_result:
+            # run security check
+            security_result = check_secure(f"{save_dir}/program.c")
+            return security_result
+        else:
+            return execute_result
     else:
         return compile_result
 
 
-agent = ReactAgent(tools=[compile_execute_code], model=model, seed=args.run_id, logger=logger)
+agent = ReactAgent(tools=[compile_execute_secure_code], model=model, seed=args.run_id, logger=logger)
 
-user_prompt = task_and_prompts[f"{args.run_id}"]
+user_prompt = task_and_prompts["informal"]
 
-user_prompt += "Do not use extra logging in the program, just the computation. Make sure that the compilation and execution is successful. Do not give extra information."
+user_prompt += "Do not use extra logging in the program, just the computation. Make sure that the compilation, execution and security check is successful. Do not give extra information."
+user_prompt += "Do not create Simple-C programs, create C programs. Use the functions from the TFHE library."
+# user_prompt += """
+# Here is the header to import:
+# #include <tfhe/tfhe.h>
+# #include <tfhe/tfhe_io.h>
+# """
 output = agent.run(user_prompt, max_rounds=10)
 # print(output)
 logger.info(f"{output}")

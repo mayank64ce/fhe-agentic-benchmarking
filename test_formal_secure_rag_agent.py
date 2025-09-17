@@ -7,6 +7,8 @@ import os
 import logging
 from tools.compiler import Compiler
 from tools.executor import Executor
+from tools.security_check import check_secure
+from tools.summary_rag import SummaryRAG
 from argparse import ArgumentParser
 from prompts import task_and_prompts
 
@@ -47,34 +49,34 @@ args = parser.parse_args()
 
 # define agent
 # model = "deepseek/deepseek-chat-v3.1:free"
-# model = "qwen/qwen3-coder"
-# model = "qwen/qwen-2.5-72b-instruct:free"
-# model = "qwen/qwen3-235b-a22b:free"
-# model = "openai/gpt-4o-2024-11-20"
-# model = "meta-llama/llama-4-maverick:free"
-model = "openai/gpt-3.5-turbo"
+model = "qwen/qwen-2.5-72b-instruct:free"
 
 # initialize save directory here
-save_dir = os.path.join("logs_formal_mod", model.split("/")[1].replace(":", "_").replace("-", "_"), 'task_and', str(args.run_id))
+save_dir = os.path.join("logs_formal_secure_rag_mod", model.split("/")[1].replace(":", "_").replace("-", "_"), 'task_and', str(args.run_id))
 
 os.makedirs(save_dir, exist_ok=True)
-
 # print(save_dir)
 logger = get_logger(save_dir)
+
 
 
 test_dir = "unit_tests/task_and"
 
 compiler = Compiler(save_dir=save_dir)
 executor = Executor(save_dir=save_dir, test_dir=test_dir)
+retriever = SummaryRAG(
+    summary_db_path="./tfhe_documentation/summaries_db.json",
+    embedding_model="text-embedding-3-small",
+    persist_directory="./chroma_tfhe_summaries",
+)
 
 @tool
-def compile_execute_code(code: str) -> str:
+def compile_execute_secure_code(code: str) -> str:
     """
-    Compiles the given C file and executes it on the test cases.
+    Compiles the given C file and executes it on the test cases. After that, it runs a security check on the code.
 
     Args:
-        code (str): The C++ code to compile and execute.
+        code (str): The C code to compile and execute.
     
     Returns:
         str: Success message if both compilation and execution are successful, error message otherwise.
@@ -82,12 +84,30 @@ def compile_execute_code(code: str) -> str:
     compile_result = compiler.compile(code)
     if "Compilation successful" in compile_result:
         execute_result = executor.execute()
-        return execute_result
+        if "successfully" in execute_result:
+            # run security check
+            security_result = check_secure(f"{save_dir}/program.c")
+            return security_result
+        else:
+            return execute_result
     else:
         return compile_result
+    
+@tool
+def rag(query: str) -> str:
+    """
+    This tool will retrieve the most relevant docstrings and function signatures for the query.
+
+    Args:
+        query (str): The query string to search for.
+    Returns:
+        str: Retrieved function signatures and summaries.
+    """
+    sig, summary, doxygen = retriever.retrieve(query, k=1)[0]
+    return "\n".join([doxygen, sig])
 
 
-agent = ReactAgent(tools=[compile_execute_code], model=model, seed=args.run_id, logger=logger)
+agent = ReactAgent(tools=[compile_execute_secure_code, rag], model=model, seed=args.run_id, logger=logger)
 
 user_prompt = task_and_prompts[f"{args.run_id}"]
 

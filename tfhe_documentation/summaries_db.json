@@ -1,173 +1,226 @@
 {
-    "summaries": [
-      {
-        "method_signature": "TFheGateBootstrappingParameterSet* new_default_gate_bootstrapping_parameters(int minimum_lambda);",
-        "summary": "Generate default gate bootstrapping parameters with a given minimum security level."
-      },
-      {
-        "method_signature": "void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet* params);",
-        "summary": "Export the TFHE gate bootstrapping parameter set to a file."
-      },
-      {
-        "method_signature": "void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& F, const TFheGateBootstrappingParameterSet* params);",
-        "summary": "Export the TFHE gate bootstrapping parameter set to an output stream."
-      },
-      {
-        "method_signature": "TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F);",
-        "summary": "Read and construct a TFHE gate bootstrapping parameter set from a file."
-      },
-      {
-        "method_signature": "TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& F);",
-        "summary": "Read and construct a TFHE gate bootstrapping parameter set from a stream."
-      },
-      {
-        "method_signature": "void delete_gate_bootstrapping_parameters(TFheGateBootstrappingParameterSet* params);",
-        "summary": "Delete and free a TFHE gate bootstrapping parameter set."
-      },
-      {
-        "method_signature": "void tfhe_random_generator_setSeed(uint32_t* values, int size);",
-        "summary": "Seed the TFHE random number generator with an array of values."
-      },
-      {
-        "method_signature": "TFheGateBootstrappingSecretKeySet* new_random_gate_bootstrapping_secret_keyset(const TFheGateBootstrappingParameterSet* params);",
-        "summary": "Generate a new random TFHE gate bootstrapping secret key set."
-      },
-      {
-        "method_signature": "void export_tfheGateBootstrappingSecretKeySet_toFile(FILE* F, const TFheGateBootstrappingSecretKeySet* keyset);",
-        "summary": "Export the TFHE gate bootstrapping secret key set to a file."
-      },
-      {
-        "method_signature": "void export_tfheGateBootstrappingSecretKeySet_toStream(std::ostream& F, const TFheGateBootstrappingSecretKeySet* keyset);",
-        "summary": "Export the TFHE gate bootstrapping secret key set to an output stream."
-      },
-      {
-        "method_signature": "TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromFile(FILE* F);",
-        "summary": "Read and construct a TFHE gate bootstrapping secret key set from a file."
-      },
-      {
-        "method_signature": "TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromStream(std::istream& F);",
-        "summary": "Read and construct a TFHE gate bootstrapping secret key set from a stream."
-      },
-      {
-        "method_signature": "void delete_gate_bootstrapping_secret_keyset(TFheGateBootstrappingSecretKeySet* keyset);",
-        "summary": "Delete and free a TFHE gate bootstrapping secret key set."
-      },
-      {
-        "method_signature": "void export_tfheGateBootstrappingCloudKeySet_toFile(FILE* F, const TFheGateBootstrappingCloudKeySet* cloudKeyset);",
-        "summary": "Export the TFHE gate bootstrapping cloud key set to a file."
-      },
-      {
-        "method_signature": "void export_tfheGateBootstrappingCloudKeySet_toStream(std::ostream& F, const TFheGateBootstrappingCloudKeySet* cloudKeyset);",
-        "summary": "Export the TFHE gate bootstrapping cloud key set to an output stream."
-      },
-      {
-        "method_signature": "TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromFile(FILE* F);",
-        "summary": "Read and construct a TFHE gate bootstrapping cloud key set from a file."
-      },
-      {
-        "method_signature": "TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromStream(std::istream& F);",
-        "summary": "Read and construct a TFHE gate bootstrapping cloud key set from a stream."
-      },
-      {
-        "method_signature": "void delete_gate_bootstrapping_cloud_keyset(TFheGateBootstrappingCloudKeySet* cloudKeyset);",
-        "summary": "Delete and free a TFHE gate bootstrapping cloud key set."
-      },
-      {
-        "method_signature": "LweSample* new_gate_bootstrapping_ciphertext(const TFheGateBootstrappingParameterSet* params);",
-        "summary": "Generate a new uninitialized TFHE gate bootstrapping ciphertext."
-      },
-      {
-        "method_signature": "LweSample* new_gate_bootstrapping_ciphertext_array(int nbelems, const TFheGateBootstrappingParameterSet* params);",
-        "summary": "Generate a new array of uninitialized TFHE gate bootstrapping ciphertexts."
-      },
-      {
-        "method_signature": "void delete_gate_bootstrapping_ciphertext(LweSample* sample);",
-        "summary": "Delete and free a TFHE gate bootstrapping ciphertext."
-      },
-      {
-        "method_signature": "void delete_gate_bootstrapping_ciphertext_array(int nbelems, LweSample* samples);",
-        "summary": "Delete and free an array of TFHE gate bootstrapping ciphertexts."
-      },
-      {
-        "method_signature": "void export_gate_bootstrapping_ciphertext_toFile(FILE* F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
-        "summary": "Export a TFHE gate bootstrapping ciphertext to a file."
-      },
-      {
-        "method_signature": "void export_gate_bootstrapping_ciphertext_toStream(std::ostream& F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
-        "summary": "Export a TFHE gate bootstrapping ciphertext to an output stream."
-      },
-      {
-        "method_signature": "void import_gate_bootstrapping_ciphertext_fromFile(FILE* F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
-        "summary": "Read and import a TFHE gate bootstrapping ciphertext from a file."
-      },
-      {
-        "method_signature": "void import_gate_bootstrapping_ciphertext_fromStream(std::istream& F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
-        "summary": "Read and import a TFHE gate bootstrapping ciphertext from a stream."
-      },
-      {
-        "method_signature": "void bootsSymEncrypt(LweSample* result, int message, const TFheGateBootstrappingSecretKeySet* params);",
-        "summary": "Encrypt a boolean value into a TFHE gate bootstrapping ciphertext using the secret key set."
-      },
-      {
-        "method_signature": "int bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* params);",
-        "summary": "Decrypt a TFHE gate bootstrapping ciphertext back into a boolean value using the secret key set."
-      },
-      {
-        "method_signature": "void bootsCONSTANT(LweSample* result, int value, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped constant gate: encrypts a constant boolean value (true or false)."
-      },
-      {
-        "method_signature": "void bootsNOT(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped NOT gate: computes the negation of input ciphertext a."
-      },
-      {
-        "method_signature": "void bootsCOPY(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped COPY gate: copies ciphertext a into result."
-      },
-      {
-        "method_signature": "void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped NAND gate: computes NOT(a AND b)."
-      },
-      {
-        "method_signature": "void bootsOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped OR gate: computes a OR b."
-      },
-      {
-        "method_signature": "void bootsAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped AND gate: computes a AND b."
-      },
-      {
-        "method_signature": "void bootsXOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped XOR gate: computes a XOR b."
-      },
-      {
-        "method_signature": "void bootsXNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped XNOR gate: computes a == b."
-      },
-      {
-        "method_signature": "void bootsNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped NOR gate: computes NOT(a OR b)."
-      },
-      {
-        "method_signature": "void bootsANDNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped AND-NY gate: computes NOT(a) AND b."
-      },
-      {
-        "method_signature": "void bootsANDYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped AND-YN gate: computes a AND NOT(b)."
-      },
-      {
-        "method_signature": "void bootsORNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped OR-NY gate: computes NOT(a) OR b."
-      },
-      {
-        "method_signature": "void bootsORYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped OR-YN gate: computes a OR NOT(b)."
-      },
-      {
-        "method_signature": "void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* bk);",
-        "summary": "Bootstrapped multiplexer gate: computes (a ? b : c)."
-      }
-    ]
-  }
-  
+  "summaries": [
+    {
+      "method_signature": "TFheGateBootstrappingParameterSet* new_default_gate_bootstrapping_parameters(int minimum_lambda);",
+      "summary": "Generate default gate bootstrapping parameters with a given minimum security level.",
+      "doxygen_docstring": "/**\n * @objective Generate default gate bootstrapping parameters with a given minimum security level\n * @param minimum_lambda Minimum security level (lambda) for the parameters\n * @return Pointer to newly allocated TFheGateBootstrappingParameterSet structure\n * \n * @example\n * // Create parameters with 128-bit security\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * if (params != NULL) {\n *     // Generate keys using these parameters\n *     TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n *     // ... use the keys for encryption/computation ...\n *     delete_gate_bootstrapping_secret_keyset(secret_key);\n *     delete_gate_bootstrapping_parameters(params);\n * }\n */"
+    },
+    {
+      "method_signature": "void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet* params);",
+      "summary": "Export the TFHE gate bootstrapping parameter set to a file.",
+      "doxygen_docstring": "/**\n * @objective Export the TFHE gate bootstrapping parameter set to a file\n * @param F File pointer where the parameters will be written\n * @param params Gate bootstrapping parameter set to export\n * @return void\n * \n * @example\n * // Create parameters\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * \n * // Export to file\n * FILE* file = fopen(\"my_params.tfhe\", \"wb\");\n * if (file != NULL) {\n *     export_tfheGateBootstrappingParameterSet_toFile(file, params);\n *     fclose(file);\n * }\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& F, const TFheGateBootstrappingParameterSet* params);",
+      "summary": "Export the TFHE gate bootstrapping parameter set to an output stream.",
+      "doxygen_docstring": "/**\n * @objective Export the TFHE gate bootstrapping parameter set to an output stream\n * @param F Output stream where the parameters will be written\n * @param params Gate bootstrapping parameter set to export\n * @return void\n * \n * @example\n * // Create parameters\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * \n * // Export to output stream\n * std::ofstream file(\"my_params.tfhe\", std::ios::binary);\n * if (file.is_open()) {\n *     export_tfheGateBootstrappingParameterSet_toStream(file, params);\n *     file.close();\n * }\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F);",
+      "summary": "Read and construct a TFHE gate bootstrapping parameter set from a file.",
+      "doxygen_docstring": "/**\n * @objective Read and construct a TFHE gate bootstrapping parameter set from a file\n * @param F File pointer to read the parameters from\n * @return Pointer to newly allocated TFheGateBootstrappingParameterSet structure\n * \n * @example\n * // Read parameters from file\n * FILE* file = fopen(\"my_params.tfhe\", \"rb\");\n * if (file != NULL) {\n *     TFheGateBootstrappingParameterSet* params = new_tfheGateBootstrappingParameterSet_fromFile(file);\n *     fclose(file);\n *     \n *     if (params != NULL) {\n *         // Use the loaded parameters\n *         TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n *         // ... perform operations ...\n *         delete_gate_bootstrapping_secret_keyset(secret_key);\n *         delete_gate_bootstrapping_parameters(params);\n *     }\n * }\n */"
+    },
+    {
+      "method_signature": "TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& F);",
+      "summary": "Read and construct a TFHE gate bootstrapping parameter set from a stream.",
+      "doxygen_docstring": "/**\n * @objective Read and construct a TFHE gate bootstrapping parameter set from a stream\n * @param F Input stream to read the parameters from\n * @return Pointer to newly allocated TFheGateBootstrappingParameterSet structure\n * \n * @example\n * // Read parameters from input stream\n * std::ifstream file(\"my_params.tfhe\", std::ios::binary);\n * if (file.is_open()) {\n *     TFheGateBootstrappingParameterSet* params = new_tfheGateBootstrappingParameterSet_fromStream(file);\n *     file.close();\n *     \n *     if (params != NULL) {\n *         // Use the loaded parameters\n *         TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n *         // ... perform operations ...\n *         delete_gate_bootstrapping_secret_keyset(secret_key);\n *         delete_gate_bootstrapping_parameters(params);\n *     }\n * }\n */"
+    },
+    {
+      "method_signature": "void delete_gate_bootstrapping_parameters(TFheGateBootstrappingParameterSet* params);",
+      "summary": "Delete and free a TFHE gate bootstrapping parameter set.",
+      "doxygen_docstring": "/**\n * @objective Delete and free a TFHE gate bootstrapping parameter set\n * @param params Gate bootstrapping parameter set to delete\n * @return void\n * \n * @example\n * // Create and use parameters\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * \n * // ... perform operations ...\n * \n * // Cleanup: delete secret key first, then parameters\n * delete_gate_bootstrapping_secret_keyset(secret_key);\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "void tfhe_random_generator_setSeed(uint32_t* values, int size);",
+      "summary": "Seed the TFHE random number generator with an array of values.",
+      "doxygen_docstring": "/**\n * @objective Seed the TFHE random number generator with an array of values\n * @param values Array of seed values for the random generator\n * @param size Number of elements in the values array\n * @return void\n * \n * @example\n * // Set random seed for reproducible results\n * uint32_t seed_values[] = {12345, 67890, 11111, 22222};\n * tfhe_random_generator_setSeed(seed_values, 4);\n * \n * // Now generate parameters and keys with this seed\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * \n * // The key generation will be deterministic with this seed\n * delete_gate_bootstrapping_secret_keyset(secret_key);\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "TFheGateBootstrappingSecretKeySet* new_random_gate_bootstrapping_secret_keyset(const TFheGateBootstrappingParameterSet* params);",
+      "summary": "Generate a new random TFHE gate bootstrapping secret key set.",
+      "doxygen_docstring": "/**\n * @objective Generate a new random TFHE gate bootstrapping secret key set\n * @param params Gate bootstrapping parameters used to generate the key set\n * @return Pointer to newly allocated TFheGateBootstrappingSecretKeySet structure\n * \n * @example\n * // Create parameters first\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * \n * // Generate random secret key set\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * \n * if (secret_key != NULL) {\n *     // Extract cloud key for homomorphic operations\n *     const TFheGateBootstrappingCloudKeySet* cloud_key = &secret_key->cloud;\n *     \n *     // Use keys for encryption and computation\n *     // ...\n *     \n *     delete_gate_bootstrapping_secret_keyset(secret_key);\n * }\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "void export_tfheGateBootstrappingSecretKeySet_toFile(FILE* F, const TFheGateBootstrappingSecretKeySet* keyset);",
+      "summary": "Export the TFHE gate bootstrapping secret key set to a file.",
+      "doxygen_docstring": "/**\n * @objective Export the TFHE gate bootstrapping secret key set to a file\n * @param F File pointer where the secret key set will be written\n * @param keyset Secret key set to export\n * @return void\n * \n * @example\n * // Generate secret key\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * \n * // Export secret key to file\n * FILE* file = fopen(\"secret_key.tfhe\", \"wb\");\n * if (file != NULL) {\n *     export_tfheGateBootstrappingSecretKeySet_toFile(file, secret_key);\n *     fclose(file);\n * }\n * \n * delete_gate_bootstrapping_secret_keyset(secret_key);\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "void export_tfheGateBootstrappingSecretKeySet_toStream(std::ostream& F, const TFheGateBootstrappingSecretKeySet* keyset);",
+      "summary": "Export the TFHE gate bootstrapping secret key set to an output stream.",
+      "doxygen_docstring": "/**\n * @objective Export the TFHE gate bootstrapping secret key set to an output stream\n * @param F Output stream where the secret key set will be written\n * @param keyset Secret key set to export\n * @return void\n * \n * @example\n * // Generate secret key\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * \n * // Export secret key to output stream\n * std::ofstream file(\"secret_key.tfhe\", std::ios::binary);\n * if (file.is_open()) {\n *     export_tfheGateBootstrappingSecretKeySet_toStream(file, secret_key);\n *     file.close();\n * }\n * \n * delete_gate_bootstrapping_secret_keyset(secret_key);\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromFile(FILE* F);",
+      "summary": "Read and construct a TFHE gate bootstrapping secret key set from a file.",
+      "doxygen_docstring": "/**\n * @objective Read and construct a TFHE gate bootstrapping secret key set from a file\n * @param F File pointer to read the secret key set from\n * @return Pointer to newly allocated TFheGateBootstrappingSecretKeySet structure\n * \n * @example\n * // Read secret key from file\n * FILE* file = fopen(\"secret_key.tfhe\", \"rb\");\n * if (file != NULL) {\n *     TFheGateBootstrappingSecretKeySet* secret_key = new_tfheGateBootstrappingSecretKeySet_fromFile(file);\n *     fclose(file);\n *     \n *     if (secret_key != NULL) {\n *         // Use the loaded secret key for encryption/decryption\n *         LweSample* ciphertext = new_gate_bootstrapping_ciphertext(secret_key->params);\n *         bootsSymEncrypt(ciphertext, 1, secret_key);\n *         int result = bootsSymDecrypt(ciphertext, secret_key);\n *         \n *         delete_gate_bootstrapping_ciphertext(ciphertext);\n *         delete_gate_bootstrapping_secret_keyset(secret_key);\n *     }\n * }\n */"
+    },
+    {
+      "method_signature": "TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromStream(std::istream& F);",
+      "summary": "Read and construct a TFHE gate bootstrapping secret key set from a stream.",
+      "doxygen_docstring": "/**\n * @objective Read and construct a TFHE gate bootstrapping secret key set from a stream\n * @param F Input stream to read the secret key set from\n * @return Pointer to newly allocated TFheGateBootstrappingSecretKeySet structure\n * \n * @example\n * // Read secret key from input stream\n * std::ifstream file(\"secret_key.tfhe\", std::ios::binary);\n * if (file.is_open()) {\n *     TFheGateBootstrappingSecretKeySet* secret_key = new_tfheGateBootstrappingSecretKeySet_fromStream(file);\n *     file.close();\n *     \n *     if (secret_key != NULL) {\n *         // Use the loaded secret key\n *         LweSample* ciphertext = new_gate_bootstrapping_ciphertext(secret_key->params);\n *         bootsSymEncrypt(ciphertext, 0, secret_key);\n *         int result = bootsSymDecrypt(ciphertext, secret_key);\n *         \n *         delete_gate_bootstrapping_ciphertext(ciphertext);\n *         delete_gate_bootstrapping_secret_keyset(secret_key);\n *     }\n * }\n */"
+    },
+    {
+      "method_signature": "void delete_gate_bootstrapping_secret_keyset(TFheGateBootstrappingSecretKeySet* keyset);",
+      "summary": "Delete and free a TFHE gate bootstrapping secret key set.",
+      "doxygen_docstring": "/**\n * @objective Delete and free a TFHE gate bootstrapping secret key set\n * @param keyset Secret key set to delete\n * @return void\n * \n * @example\n * // Generate and use secret key\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * \n * // Use the secret key for operations\n * LweSample* ciphertext = new_gate_bootstrapping_ciphertext(params);\n * bootsSymEncrypt(ciphertext, 1, secret_key);\n * int result = bootsSymDecrypt(ciphertext, secret_key);\n * \n * // Cleanup\n * delete_gate_bootstrapping_ciphertext(ciphertext);\n * delete_gate_bootstrapping_secret_keyset(secret_key);  // Free secret key\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "void export_tfheGateBootstrappingCloudKeySet_toFile(FILE* F, const TFheGateBootstrappingCloudKeySet* cloudKeyset);",
+      "summary": "Export the TFHE gate bootstrapping cloud key set to a file.",
+      "doxygen_docstring": "/**\n * @objective Export the TFHE gate bootstrapping cloud key set to a file\n * @param F File pointer where the cloud key set will be written\n * @param cloudKeyset Cloud key set to export\n * @return void\n * \n * @example\n * // Generate keys\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * const TFheGateBootstrappingCloudKeySet* cloud_key = &secret_key->cloud;\n * \n * // Export cloud key to file for server use\n * FILE* file = fopen(\"cloud_key.tfhe\", \"wb\");\n * if (file != NULL) {\n *     export_tfheGateBootstrappingCloudKeySet_toFile(file, cloud_key);\n *     fclose(file);\n * }\n * \n * delete_gate_bootstrapping_secret_keyset(secret_key);\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "void export_tfheGateBootstrappingCloudKeySet_toStream(std::ostream& F, const TFheGateBootstrappingCloudKeySet* cloudKeyset);",
+      "summary": "Export the TFHE gate bootstrapping cloud key set to an output stream.",
+      "doxygen_docstring": "/**\n * @objective Export the TFHE gate bootstrapping cloud key set to an output stream\n * @param F Output stream where the cloud key set will be written\n * @param cloudKeyset Cloud key set to export\n * @return void\n * \n * @example\n * // Generate keys\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * const TFheGateBootstrappingCloudKeySet* cloud_key = &secret_key->cloud;\n * \n * // Export cloud key to output stream\n * std::ofstream file(\"cloud_key.tfhe\", std::ios::binary);\n * if (file.is_open()) {\n *     export_tfheGateBootstrappingCloudKeySet_toStream(file, cloud_key);\n *     file.close();\n * }\n * \n * delete_gate_bootstrapping_secret_keyset(secret_key);\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromFile(FILE* F);",
+      "summary": "Read and construct a TFHE gate bootstrapping cloud key set from a file.",
+      "doxygen_docstring": "/**\n * @objective Read and construct a TFHE gate bootstrapping cloud key set from a file\n * @param F File pointer to read the cloud key set from\n * @return Pointer to newly allocated TFheGateBootstrappingCloudKeySet structure\n */"
+    },
+    {
+      "method_signature": "TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromStream(std::istream& F);",
+      "summary": "Read and construct a TFHE gate bootstrapping cloud key set from a stream.",
+      "doxygen_docstring": "/**\n * @objective Read and construct a TFHE gate bootstrapping cloud key set from a stream\n * @param F Input stream to read the cloud key set from\n * @return Pointer to newly allocated TFheGateBootstrappingCloudKeySet structure\n */"
+    },
+    {
+      "method_signature": "void delete_gate_bootstrapping_cloud_keyset(TFheGateBootstrappingCloudKeySet* cloudKeyset);",
+      "summary": "Delete and free a TFHE gate bootstrapping cloud key set.",
+      "doxygen_docstring": "/**\n * @objective Delete and free a TFHE gate bootstrapping cloud key set\n * @param cloudKeyset Cloud key set to delete\n * @return void\n */"
+    },
+    {
+      "method_signature": "LweSample* new_gate_bootstrapping_ciphertext(const TFheGateBootstrappingParameterSet* params);",
+      "summary": "Generate a new uninitialized TFHE gate bootstrapping ciphertext.",
+      "doxygen_docstring": "/**\n * @objective Generate a new uninitialized TFHE gate bootstrapping ciphertext\n * @param params Gate bootstrapping parameters for ciphertext initialization\n * @return Pointer to newly allocated LweSample structure\n */"
+    },
+    {
+      "method_signature": "LweSample* new_gate_bootstrapping_ciphertext_array(int nbelems, const TFheGateBootstrappingParameterSet* params);",
+      "summary": "Generate a new array of uninitialized TFHE gate bootstrapping ciphertexts.",
+      "doxygen_docstring": "/**\n * @objective Generate a new array of uninitialized TFHE gate bootstrapping ciphertexts\n * @param nbelems Number of ciphertext elements in the array\n * @param params Gate bootstrapping parameters for ciphertext initialization\n * @return Pointer to newly allocated array of LweSample structures\n */"
+    },
+    {
+      "method_signature": "void delete_gate_bootstrapping_ciphertext(LweSample* sample);",
+      "summary": "Delete and free a TFHE gate bootstrapping ciphertext.",
+      "doxygen_docstring": "/**\n * @objective Delete and free a TFHE gate bootstrapping ciphertext\n * @param sample Ciphertext to delete\n * @return void\n */"
+    },
+    {
+      "method_signature": "void delete_gate_bootstrapping_ciphertext_array(int nbelems, LweSample* samples);",
+      "summary": "Delete and free an array of TFHE gate bootstrapping ciphertexts.",
+      "doxygen_docstring": "/**\n * @objective Delete and free an array of TFHE gate bootstrapping ciphertexts\n * @param nbelems Number of ciphertext elements in the array\n * @param samples Array of ciphertexts to delete\n * @return void\n */"
+    },
+    {
+      "method_signature": "void export_gate_bootstrapping_ciphertext_toFile(FILE* F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
+      "summary": "Export a TFHE gate bootstrapping ciphertext to a file.",
+      "doxygen_docstring": "/**\n * @objective Export a TFHE gate bootstrapping ciphertext to a file\n * @param F File pointer where the ciphertext will be written\n * @param sample Ciphertext to export\n * @param params Gate bootstrapping parameters associated with the ciphertext\n * @return void\n */"
+    },
+    {
+      "method_signature": "void export_gate_bootstrapping_ciphertext_toStream(std::ostream& F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
+      "summary": "Export a TFHE gate bootstrapping ciphertext to an output stream.",
+      "doxygen_docstring": "/**\n * @objective Export a TFHE gate bootstrapping ciphertext to an output stream\n * @param F Output stream where the ciphertext will be written\n * @param sample Ciphertext to export\n * @param params Gate bootstrapping parameters associated with the ciphertext\n * @return void\n */"
+    },
+    {
+      "method_signature": "void import_gate_bootstrapping_ciphertext_fromFile(FILE* F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
+      "summary": "Read and import a TFHE gate bootstrapping ciphertext from a file.",
+      "doxygen_docstring": "/**\n * @objective Read and import a TFHE gate bootstrapping ciphertext from a file\n * @param F File pointer to read the ciphertext from\n * @param sample Pre-allocated ciphertext structure to populate\n * @param params Gate bootstrapping parameters associated with the ciphertext\n * @return void\n */"
+    },
+    {
+      "method_signature": "void import_gate_bootstrapping_ciphertext_fromStream(std::istream& F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);",
+      "summary": "Read and import a TFHE gate bootstrapping ciphertext from a stream.",
+      "doxygen_docstring": "/**\n * @objective Read and import a TFHE gate bootstrapping ciphertext from a stream\n * @param F Input stream to read the ciphertext from\n * @param sample Pre-allocated ciphertext structure to populate\n * @param params Gate bootstrapping parameters associated with the ciphertext\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsSymEncrypt(LweSample* result, int message, const TFheGateBootstrappingSecretKeySet* params);",
+      "summary": "Encrypt a boolean value into a TFHE gate bootstrapping ciphertext using the secret key set.",
+      "doxygen_docstring": "/**\n * @objective Encrypt a boolean value into a TFHE gate bootstrapping ciphertext using the secret key set\n * @param result Output ciphertext containing the encrypted message\n * @param message Boolean value to encrypt (0 or 1)\n * @param params Secret key set used for encryption\n * @return void\n * \n * @example\n * // Setup keys and parameters\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * \n * // Create ciphertext\n * LweSample* ciphertext = new_gate_bootstrapping_ciphertext(params);\n * \n * // Encrypt boolean values\n * bootsSymEncrypt(ciphertext, 1, secret_key);  // Encrypt true\n * int decrypted = bootsSymDecrypt(ciphertext, secret_key);  // Should be 1\n * \n * bootsSymEncrypt(ciphertext, 0, secret_key);  // Encrypt false\n * decrypted = bootsSymDecrypt(ciphertext, secret_key);  // Should be 0\n * \n * // Cleanup\n * delete_gate_bootstrapping_ciphertext(ciphertext);\n * delete_gate_bootstrapping_secret_keyset(secret_key);\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "int bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* params);",
+      "summary": "Decrypt a TFHE gate bootstrapping ciphertext back into a boolean value using the secret key set.",
+      "doxygen_docstring": "/**\n * @objective Decrypt a TFHE gate bootstrapping ciphertext back into a boolean value using the secret key set\n * @param sample Ciphertext to decrypt\n * @param params Secret key set used for decryption\n * @return Decrypted boolean value (0 or 1)\n */"
+    },
+    {
+      "method_signature": "void bootsCONSTANT(LweSample* result, int value, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped constant gate: encrypts a constant boolean value (true or false).",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise constant gate operation to encrypt a constant boolean value\n * @param result Output ciphertext containing the encrypted constant\n * @param value Constant boolean value to encrypt (0 or 1)\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsNOT(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped NOT gate: computes the negation of input ciphertext a.",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise NOT gate operation\n * @param result Output ciphertext (NOT a)\n * @param ca First encrypted input\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsCOPY(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped COPY gate: copies ciphertext a into result.",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise COPY gate operation\n * @param result Output ciphertext (copy of a)\n * @param ca Encrypted input to copy\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped NAND gate: computes NOT(a AND b).",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise NAND gate operation\n * @param result Output ciphertext (NOT(a AND b))\n * @param ca First encrypted input\n * @param cb Second encrypted input\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped OR gate: computes a OR b.",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise OR gate operation\n * @param result Output ciphertext (a OR b)\n * @param ca First encrypted input\n * @param cb Second encrypted input\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped AND gate: computes a AND b.",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise AND gate operation\n * @param result Output ciphertext (a AND b)\n * @param ca First encrypted input\n * @param cb Second encrypted input\n * @param bk Cloud key for bootstrapping\n * @return void\n * \n * @example\n * // Setup keys\n * TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(128);\n * TFheGateBootstrappingSecretKeySet* secret_key = new_random_gate_bootstrapping_secret_keyset(params);\n * const TFheGateBootstrappingCloudKeySet* cloud_key = &secret_key->cloud;\n * \n * // Create ciphertexts\n * LweSample* bit_a = new_gate_bootstrapping_ciphertext(params);\n * LweSample* bit_b = new_gate_bootstrapping_ciphertext(params);\n * LweSample* result = new_gate_bootstrapping_ciphertext(params);\n * \n * // Encrypt values: true AND false = false\n * bootsSymEncrypt(bit_a, 1, secret_key);\n * bootsSymEncrypt(bit_b, 0, secret_key);\n * \n * // Perform AND operation\n * bootsAND(result, bit_a, bit_b, cloud_key);\n * \n * // Decrypt result\n * int output = bootsSymDecrypt(result, secret_key);  // Should be 0\n * \n * // Cleanup\n * delete_gate_bootstrapping_ciphertext(bit_a);\n * delete_gate_bootstrapping_ciphertext(bit_b);\n * delete_gate_bootstrapping_ciphertext(result);\n * delete_gate_bootstrapping_secret_keyset(secret_key);\n * delete_gate_bootstrapping_parameters(params);\n */"
+    },
+    {
+      "method_signature": "void bootsXOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped XOR gate: computes a XOR b.",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise XOR gate operation\n * @param result Output ciphertext (a XOR b)\n * @param ca First encrypted input\n * @param cb Second encrypted input\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsXNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped XNOR gate: computes a == b.",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise XNOR gate operation\n * @param result Output ciphertext (a XNOR b, equivalent to a == b)\n * @param ca First encrypted input\n * @param cb Second encrypted input\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped NOR gate: computes NOT(a OR b).",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise NOR gate operation\n * @param result Output ciphertext (NOT(a OR b))\n * @param ca First encrypted input\n * @param cb Second encrypted input\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsANDNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped AND-NY gate: computes NOT(a) AND b.",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise AND-NY gate operation\n * @param result Output ciphertext (NOT(a) AND b)\n * @param ca First encrypted input (negated)\n * @param cb Second encrypted input\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsANDYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped AND-YN gate: computes a AND NOT(b).",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise AND-YN gate operation\n * @param result Output ciphertext (a AND NOT(b))\n * @param ca First encrypted input\n * @param cb Second encrypted input (negated)\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsORNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped OR-NY gate: computes NOT(a) OR b.",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise OR-NY gate operation\n * @param result Output ciphertext (NOT(a) OR b)\n * @param ca First encrypted input (negated)\n * @param cb Second encrypted input\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsORYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped OR-YN gate: computes a OR NOT(b).",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise OR-YN gate operation\n * @param result Output ciphertext (a OR NOT(b))\n * @param ca First encrypted input\n * @param cb Second encrypted input (negated)\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* bk);",
+      "summary": "Bootstrapped multiplexer gate: computes (a ? b : c).",
+      "doxygen_docstring": "/**\n * @objective Perform bitwise multiplexer gate operation\n * @param result Output ciphertext (a ? b : c)\n * @param a Control encrypted input (selector)\n * @param b First data encrypted input (selected when a is true)\n * @param c Second data encrypted input (selected when a is false)\n * @param bk Cloud key for bootstrapping\n * @return void\n */"
+    },
+    {
+      "method_signature": "// Required headers for TFHE functions",
+      "summary": "Standard TFHE header files that must be included when using TFHE library functions.",
+      "doxygen_docstring": "/**\n * @objective Include necessary header files for TFHE operations\n * @note Main TFHE header: #include <tfhe/tfhe.h>\n * @note I/O operations: #include <tfhe/tfhe_io.h>\n * @note File operations: #include <stdio.h>\n * @note Stream operations: #include <iostream>\n * @note Standard library: #include <cstdint>\n */",
+      "required_headers": [
+        "#include <tfhe/tfhe.h>",
+        "#include <tfhe/tfhe_io.h>",
+        "#include <stdio.h>",
+        "#include <iostream>",
+        "#include <cstdint>"
+      ]
+    }
+  ]
+}

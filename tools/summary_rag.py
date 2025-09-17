@@ -14,9 +14,9 @@ load_dotenv()
 
 class SummaryRAG:
     """
-    Simple RAG over TFHE summaries to fetch method signatures.
+    Simple RAG over TFHE summaries to fetch method signatures and doxygen docstrings.
     Expects JSON of the form:
-      { "summaries": [ {"summary": "...", "method_signature": "..."}, ... ] }
+      { "summaries": [ {"summary": "...", "method_signature": "...", "doxygen_docstring": "..."}, ... ] }
     """
 
     def __init__(
@@ -50,25 +50,29 @@ class SummaryRAG:
 
     def _load_documents(self):
         """
-        Load JSON and build documents where page_content is the summary
-        and metadata contains the method_signature (so we can return it).
+        Load JSON and build documents where page_content is the summary + doxygen docstring
+        and metadata contains the method_signature and doxygen_docstring.
         """
         # jq extracts exactly the fields we need; content_key decides what is embedded
         loader = JSONLoader(
             file_path=str(self.summary_db_path),
-            jq_schema='.summaries[] | {summary: .summary, method_signature: .method_signature}',
+            jq_schema='.summaries[] | {summary: .summary, method_signature: .method_signature, doxygen_docstring: .doxygen_docstring}',
             content_key="summary",
-            metadata_func=lambda r, _: {"method_signature": r.get("method_signature", "")},
+            metadata_func=lambda r, _: {
+                "method_signature": r.get("method_signature", ""),
+                "doxygen_docstring": r.get("doxygen_docstring", "")
+            },
             text_content=True,
         )
         base_docs: List[Document] = loader.load()
 
-        # Optional: include signature text in the embedding text to help retrieval
+        # Include both summary and doxygen docstring in the embedding text for better retrieval
         enriched_docs: List[Document] = []
         for d in base_docs:
             sig = d.metadata.get("method_signature", "")
-            # prepend/append signature so keyword-y queries match better
-            content = f"{d.page_content}\n\nSignature: {sig}" # kinda not sure about this
+            doxygen = d.metadata.get("doxygen_docstring", "")
+            # Combine summary, doxygen docstring, and signature for comprehensive embedding
+            content = f"Doxygen Documentation:\n{doxygen}\n\nSignature: {sig}"
             enriched_docs.append(Document(page_content=content, metadata=d.metadata))
 
         splitter = RecursiveCharacterTextSplitter(
@@ -115,16 +119,29 @@ class SummaryRAG:
 
     def retrieve(self, query: str, k: int = 3):
         """
-        Return (signature, summary_text) tuples for top-k.
+        Return (signature, summary_text, doxygen_docstring) tuples for top-k.
         """
         results = self.store.similarity_search(query, k=k)
         out = []
         for d in results:
             sig = d.metadata.get("method_signature", "")
-            # Strip the synthetic "Signature: ..." added to page_content
-            cleaned_summary = d.page_content.rsplit("\n\nSignature:", 1)[0].strip()
-            out.append((sig, cleaned_summary))
+            doxygen = d.metadata.get("doxygen_docstring", "")
+            # Strip the synthetic content added to page_content
+            cleaned_summary = d.page_content.split("\n\nDoxygen Documentation:")[0].strip()
+            out.append((sig, cleaned_summary, doxygen))
         return out
+
+    def retrieve_doxygen_docs(self, query: str, k: int = 3) -> List[str]:
+        """
+        Return top-k doxygen docstrings most relevant to the query.
+        """
+        results = self.store.similarity_search(query, k=k)
+        docs = []
+        for d in results:
+            doxygen = d.metadata.get("doxygen_docstring", "")
+            if doxygen and doxygen not in docs:
+                docs.append(doxygen)
+        return docs[:k]
 
 
 if __name__ == "__main__":
@@ -136,12 +153,18 @@ if __name__ == "__main__":
 
     tests = [
         "bitwise AND of 2 integers",
-        "homomorphic multiplexer (a ? b : c)",
+        # "homomorphic multiplexer (a ? b : c)",
         # "create default bootstrapping parameters",
         # "export cloud key to a stream",
         # "bitwise and gate on encrypted bits",
     ]
+    
+    print("=== Testing signature retrieval ===")
     for q in tests:
         print(f"\nQ: {q}")
-        for s in rag.retrieve_signatures(q, k=2):
-            print("  →", s)
+        # for (sig, summary, doxygen) in rag.retrieve(q, k=2):
+        #     retrived = "\n".join([doxygen, sig])
+        #     print("  →", retrived)
+        sig, summary, doxygen = rag.retrieve(q, k=1)[0]
+        retrived = "\n".join([doxygen, sig])
+        print("  →", retrived)

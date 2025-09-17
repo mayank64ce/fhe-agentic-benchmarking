@@ -42,7 +42,7 @@ def compute_crystalbleu(reference_code, generated_code, k=50):
     return score
 
 # Paths
-logs_dir = 'logs_zscot'
+logs_dir = 'logs_formal_secure_rag_mod'
 references_dir = 'references'
 
 # folder format: logs/<model_name>/<task_name>/<run_id>/

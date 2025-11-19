@@ -6,8 +6,7 @@ from promptml.parser import PromptParser
 from jinja2 import Template
 from agents.utils.completions import completions_create, ChatHistory, build_prompt_structure
 from agents.utils.extraction import extract_tag_content
-from prompts import system_prompt_intent_extraction, system_prompt_dafny_conversion
-from le import get_lambda
+from .prompts import system_prompt_intent_extraction, system_prompt_dafny_conversion
 from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
@@ -176,6 +175,8 @@ def complete_spec(partial_spec: str | dict) -> str | dict:
     if partial_spec.get("minimum_lambda") is not None:
         return {"minimum_lambda": partial_spec["minimum_lambda"]}
     # 2. Otherwise, fill in the missing parameters using defaults from lattice estimator
+    from .le import get_lambda
+
     n = partial_spec.get("n") or 630
     xs_sigma = partial_spec.get("xs_sigma") or 0.5
     xs_mu = partial_spec.get("xs_mu") or 0.5

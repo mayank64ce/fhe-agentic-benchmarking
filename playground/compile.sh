@@ -1,0 +1,1 @@
+g++ temp2.c -o test -I/usr/local/include -L/usr/local/lib -ltfhe-spqlios-fma

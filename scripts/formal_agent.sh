@@ -1,5 +1,5 @@
 #!bin/bash
-for run_id in {0..1}
+for run_id in {0..4}
 do
     echo "Starting run ${run_id}"
     python test_formal_agent.py --run_id ${run_id}

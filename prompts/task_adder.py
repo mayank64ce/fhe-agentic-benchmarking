@@ -1,0 +1,1 @@
+task_prompt_adder = "Write a TFHE code in C that homomorphically adds two 32-bit signed integers (two’s complement). Encrypt each input bit LSB-first, implement a ripple-carry adder, decrypt the result, and print it. Make sure that the code compiles and executes successfully."

@@ -1,0 +1,1 @@
+task_prompt_mult = "Write a TFHE code in C that homomorphically multiplies two 32-bit signed integers and produces a 64-bit signed result. Use unsigned schoolbook multiplication plus conditional negation to handle signs, accumulate in 64 bits, decrypt, and print. Make sure that the code compiles and executes successfully."

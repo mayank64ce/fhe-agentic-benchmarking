@@ -41,4 +41,18 @@ def evaluate_security_over_runs(
 
 
 if __name__ == "__main__":
-    evaluate_security_over_runs("logs_formal_secure_rag_mod")
+    directories = [
+        "logs",
+        "logs_formal_mod",
+        "logs_formal_rag_mod",
+        "logs_formal_secure_mod",
+        "logs_formal_secure_rag_mod",
+        "logs_rag",
+        "logs_secure",
+        "logs_secure_rag",
+    ]
+
+    for dir in directories:
+        print(f"Evaluating security for runs in {dir}...")
+        evaluate_security_over_runs(dir)
+    # evaluate_security_over_runs("logs_formal_secure_rag_mod")

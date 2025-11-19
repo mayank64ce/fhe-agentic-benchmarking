@@ -10,7 +10,7 @@ from tools.executor import Executor
 from tools.security_check import check_secure
 from tools.summary_rag import SummaryRAG
 from argparse import ArgumentParser
-from prompts import task_and_prompts
+from prompts import task_and_prompts, task_relu_prompts
 
 def get_logger(save_dir: str):
     log_file = os.path.join(save_dir, "run.log")
@@ -49,10 +49,12 @@ args = parser.parse_args()
 
 # define agent
 # model = "deepseek/deepseek-chat-v3.1:free"
-model = "qwen/qwen-2.5-72b-instruct:free"
+# model = "qwen/qwen-2.5-72b-instruct:free"
+model = "google/gemini-2.5-pro"
 
+task = "task_relu"
 # initialize save directory here
-save_dir = os.path.join("logs_formal_secure_rag_mod", model.split("/")[1].replace(":", "_").replace("-", "_"), 'task_and', str(args.run_id))
+save_dir = os.path.join("logs_formal_secure_rag_mod", model.split("/")[1].replace(":", "_").replace("-", "_"), task, str(args.run_id))
 
 os.makedirs(save_dir, exist_ok=True)
 # print(save_dir)
@@ -60,7 +62,7 @@ logger = get_logger(save_dir)
 
 
 
-test_dir = "unit_tests/task_and"
+test_dir = f"unit_tests/{task}"
 
 compiler = Compiler(save_dir=save_dir)
 executor = Executor(save_dir=save_dir, test_dir=test_dir)
@@ -109,7 +111,7 @@ def rag(query: str) -> str:
 
 agent = ReactAgent(tools=[compile_execute_secure_code, rag], model=model, seed=args.run_id, logger=logger)
 
-user_prompt = task_and_prompts[f"{args.run_id}"]
+user_prompt = task_relu_prompts[f"0"]
 
 user_prompt += "Do not use extra logging in the program, just the computation. Make sure that the compilation and execution is successful. Do not give extra information."
 output = agent.run(user_prompt, max_rounds=10)

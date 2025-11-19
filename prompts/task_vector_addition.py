@@ -1,0 +1,1 @@
+task_prompt_vector_addition = "Write a TFHE code in C that performs element-wise addition of two encrypted 32-bit integer vectors (e.g., length N=8). Encrypt inputs bitwise (LSB-first), add with a ripple-carry adder per element, decrypt, and print the resulting vector. Make sure that the code compiles and executes successfully."

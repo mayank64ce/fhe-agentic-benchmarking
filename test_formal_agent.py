@@ -8,7 +8,7 @@ import logging
 from tools.compiler import Compiler
 from tools.executor import Executor
 from argparse import ArgumentParser
-from prompts import task_and_prompts
+from prompts import task_and_prompts, task_relu_prompts
 
 def get_logger(save_dir: str):
     log_file = os.path.join(save_dir, "run.log")
@@ -44,18 +44,20 @@ parser = ArgumentParser()
 parser.add_argument("--run_id", type=int, default=0, help="Run ID for the experiment")
 
 args = parser.parse_args()
+task = "task_relu"
 
 # define agent
-# model = "deepseek/deepseek-chat-v3.1:free"
+model = "deepseek/deepseek-chat-v3.1:free"
 # model = "qwen/qwen3-coder"
 # model = "qwen/qwen-2.5-72b-instruct:free"
 # model = "qwen/qwen3-235b-a22b:free"
 # model = "openai/gpt-4o-2024-11-20"
 # model = "meta-llama/llama-4-maverick:free"
-model = "openai/gpt-3.5-turbo"
+# model = "openai/gpt-3.5-turbo"
+# model = "google/gemini-2.5-pro"
 
 # initialize save directory here
-save_dir = os.path.join("logs_formal_mod", model.split("/")[1].replace(":", "_").replace("-", "_"), 'task_and', str(args.run_id))
+save_dir = os.path.join("logs_formal_mod", model.split("/")[1].replace(":", "_").replace("-", "_"), task, str(args.run_id))
 
 os.makedirs(save_dir, exist_ok=True)
 
@@ -63,7 +65,7 @@ os.makedirs(save_dir, exist_ok=True)
 logger = get_logger(save_dir)
 
 
-test_dir = "unit_tests/task_and"
+test_dir = f"unit_tests/{task}"
 
 compiler = Compiler(save_dir=save_dir)
 executor = Executor(save_dir=save_dir, test_dir=test_dir)
@@ -89,9 +91,9 @@ def compile_execute_code(code: str) -> str:
 
 agent = ReactAgent(tools=[compile_execute_code], model=model, seed=args.run_id, logger=logger)
 
-user_prompt = task_and_prompts[f"{args.run_id}"]
+user_prompt = task_relu_prompts[f"{0}"]
 
-user_prompt += "Do not use extra logging in the program, just the computation. Make sure that the compilation and execution is successful. Do not give extra information."
+user_prompt += "Do not use extra logging in the program, just the computation. Stop the compilation and execution is successful, all tests have passed. Do not give extra information."
 output = agent.run(user_prompt, max_rounds=10)
 # print(output)
 logger.info(f"{output}")

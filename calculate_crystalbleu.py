@@ -42,50 +42,68 @@ def compute_crystalbleu(reference_code, generated_code, k=50):
     return score
 
 # Paths
-logs_dir = 'logs_formal_secure_rag_mod'
-references_dir = 'references'
 
-# folder format: logs/<model_name>/<task_name>/<run_id>/
+def calculate_crystalbleu(logs_dir):
+    # logs_dir = 'logs_formal_secure_rag_mod'
+    references_dir = 'references'
 
-# Find All Runs
-for model_name in os.listdir(logs_dir):
-    model_path = os.path.join(logs_dir, model_name)
-    if not os.path.isdir(model_path):
-        continue
+    # folder format: logs/<model_name>/<task_name>/<run_id>/
 
-    for task_name in os.listdir(model_path):
-        task_path = os.path.join(model_path, task_name)
-        if not os.path.isdir(task_path):
-            continue
-        
-        # Load Reference
-        reference_file = os.path.join(references_dir, f"{task_name}.c")
-        if not os.path.exists(reference_file):
-            print(f"Reference not found for task {task_name}")
+    # Find All Runs
+    for model_name in os.listdir(logs_dir):
+        model_path = os.path.join(logs_dir, model_name)
+        if not os.path.isdir(model_path):
             continue
 
-        with open(reference_file, 'r') as ref_f:
-            reference_code = ref_f.read()
-
-        # Process Each Run
-        for run_id in os.listdir(task_path):
-            run_path = os.path.join(task_path, run_id)
-            # generated_file = os.path.join(run_path, f'{model_name}_{task_name}_{run_id}.cpp')
-            generated_file = os.path.join(run_path, f'program.c')
-            report_file = os.path.join(run_path, 'cystalbleu.log')
-
-            if not os.path.exists(generated_file):
-                print(f"No generated.c in {run_path}")
+        for task_name in os.listdir(model_path):
+            task_path = os.path.join(model_path, task_name)
+            if not os.path.isdir(task_path):
+                continue
+            
+            # Load Reference
+            reference_file = os.path.join(references_dir, f"{task_name}.c")
+            if not os.path.exists(reference_file):
+                print(f"Reference not found for task {task_name}")
                 continue
 
-            with open(generated_file, 'r') as gen_f:
-                generated_code = gen_f.read()
+            with open(reference_file, 'r') as ref_f:
+                reference_code = ref_f.read()
 
-            # Compute CrystalBLEU
-            score = compute_crystalbleu(reference_code, generated_code, k=50)
+            # Process Each Run
+            for run_id in os.listdir(task_path):
+                run_path = os.path.join(task_path, run_id)
+                # generated_file = os.path.join(run_path, f'{model_name}_{task_name}_{run_id}.cpp')
+                generated_file = os.path.join(run_path, f'program.c')
+                report_file = os.path.join(run_path, 'cystalbleu.log')
 
-            # Save Report
-            with open(report_file, 'w') as report_f:
-                report_f.write(f"CrystalBLEU Score: {score:.6f}\n")
+                if not os.path.exists(generated_file):
+                    print(f"No generated.c in {run_path}")
+                    continue
 
-            print(f"Run {run_id}: CrystalBLEU = {score:.6f}")
+                with open(generated_file, 'r') as gen_f:
+                    generated_code = gen_f.read()
+
+                # Compute CrystalBLEU
+                score = compute_crystalbleu(reference_code, generated_code, k=50)
+
+                # Save Report
+                with open(report_file, 'w') as report_f:
+                    report_f.write(f"CrystalBLEU Score: {score:.6f}\n")
+
+                print(f"Run {run_id}: CrystalBLEU = {score:.6f}")
+
+if __name__ == "__main__":
+    directories = [
+        "logs",
+        "logs_formal_mod",
+        "logs_formal_rag_mod",
+        "logs_formal_secure_mod",
+        "logs_formal_secure_rag_mod",
+        "logs_rag",
+        "logs_secure",
+        "logs_secure_rag",
+    ]
+
+    for dir in directories:
+        print(f"Calculating CrystalBLEU for runs in {dir}...")
+        calculate_crystalbleu(dir)

@@ -1,0 +1,1 @@
+task_prompt_dot_product= "Write a TFHE code in C that computes the encrypted dot product of two 32-bit integer vectors of equal length, accumulating into a 64-bit sum to avoid overflow. Use homomorphic 32×32→64 multiplies and 64-bit additions, then decrypt and print the int64 result. Make sure that the code compiles and executes successfully."

@@ -17,7 +17,12 @@ def completions_create(client, messages: list, model: str, seed: int = 0) -> str
     # Sleep for a random time between 0.5 and 3 seconds
     sleep_time = random.uniform(0.5, 3.0)
     time.sleep(sleep_time)
-    response = client.chat.completions.create(messages=messages, model=model, seed=seed)
+    response = client.chat.completions.create(
+        messages=messages, 
+        model=model, 
+        seed=seed, 
+        # max_tokens=2048
+    )
     return str(response.choices[0].message.content)
 
 
@@ -92,6 +97,26 @@ class FixedFirstChatHistory(ChatHistory):
         """
         if len(self) == self.total_length:
             self.pop(1)
+        super().append(msg)
+
+class FixedSecondChatHistory(ChatHistory):
+    def __init__(self, messages: list | None = None, total_length: int = -1):
+        """Initialise the queue with a fixed total length.
+
+        Args:
+            messages (list | None): A list of initial messages
+            total_length (int): The maximum number of messages the chat history can hold.
+        """
+        super().__init__(messages, total_length)
+
+    def append(self, msg: str):
+        """Add a message to the queue. The first messaage will always stay fixed.
+
+        Args:
+            msg (str): The message to be added to the queue
+        """
+        if len(self) == self.total_length:
+            self.pop(2)
         super().append(msg)
 
 if __name__ == "__main__":

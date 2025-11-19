@@ -9,7 +9,7 @@ from openai import OpenAI # from groq import Groq
 from .tool import Tool
 from .tool import validate_arguments
 from .utils.completions import build_prompt_structure
-from .utils.completions import ChatHistory
+from .utils.completions import ChatHistory, FixedSecondChatHistory
 from .utils.completions import completions_create
 from .utils.completions import update_chat_history
 from .utils.extraction import extract_tag_content
@@ -159,14 +159,15 @@ class ReactAgent:
                 "\n" + REACT_SYSTEM_PROMPT % self.add_tool_signatures()
             )
 
-        chat_history = ChatHistory(
+        chat_history = FixedSecondChatHistory(
             [
                 build_prompt_structure(
                     prompt=self.system_prompt,
                     role="system",
                 ),
                 user_prompt,
-            ]
+            ],
+            total_length=3
         )
 
         if self.tools:
@@ -174,7 +175,7 @@ class ReactAgent:
             for _ in range(max_rounds):
 
                 completion = completions_create(self.client, chat_history, self.model, self.seed)
-                
+
                 response = extract_tag_content(str(completion), "response")
                 if response.found:
                     return response.content[0]
@@ -193,6 +194,9 @@ class ReactAgent:
                     observations = self.process_tool_calls(tool_calls.content)
                     if self.logger:
                         self.logger.info(Fore.BLUE + f"\nObservations: {observations}")
+                    key_zero = list(observations.keys())[0]
+                    if observations[key_zero] == "Code is secure!":
+                        return "Code is secure!"
                     # print(Fore.BLUE + f"\nObservations: {observations}")
                     update_chat_history(chat_history, f"{observations}", "user")
 

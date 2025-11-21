@@ -1,0 +1,1 @@
+task_prompt_softmax= "Write a TFHE code in C that computes the encrypted softmax on logits of length 8. Make sure that the code compiles and executes successfully."

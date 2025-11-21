@@ -1,0 +1,1 @@
+task_prompt_attention= "Write a TFHE code in C that computes the encrypted attention mechanism on an input matrices of shape 8x8. Make sure that the code compiles and executes successfully."

@@ -6,7 +6,7 @@ from promptml.parser import PromptParser
 from jinja2 import Template
 from agents.utils.completions import completions_create, ChatHistory, build_prompt_structure
 from agents.utils.extraction import extract_tag_content
-from .prompts import system_prompt_intent_extraction, system_prompt_dafny_conversion
+from prompts import system_prompt_intent_extraction, system_prompt_dafny_conversion
 from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
@@ -72,12 +72,13 @@ def convert_to_formal_prompt(intent: str, dafny_code: str, code_reqs: str) -> st
             Code should not have any extra logging or print statements.
         @end
         @step
-            Code should not be a basic C program, it should use TFHE library functions.
+            Code should not be a basic python program, it should use openfhe_numpy library functions.
         @end
         @step
-            The TFHE header files to include are:
-                #include <tfhe/tfhe.h>
-                #include <tfhe/tfhe_io.h>
+            The OpenFHE numpy header files to include are:
+            import numpy as np
+            from openfhe import *
+            import openfhe_numpy as onp
         @end
         @step
             Code should have `assert` statements to implement the `ensure` and `requires` statements in the Dafny code.
@@ -308,8 +309,8 @@ def formalize_user_prompt(user_prompt: str, model: str, seed: int = 0) -> str:
 
 def test_formalize_user_prompt():
     # user_prompt = "Write a javascript function to check if a number is prime. If the input isn't a positive integer, it should throw an error."
-    user_prompt = "Write me a TFHE C code to bitwise XOR 2 integers. The security parameter should be at least 150 bits."
-    model = "deepseek/deepseek-chat-v3.1:free"
+    user_prompt = "Write me a python code to build a transformer block. The security parameter should be at least 150 bits."
+    model = "deepseek/deepseek-chat-v3.1"
     formal_prompt = formalize_user_prompt(user_prompt, model)
     print("User Prompt:",'\n', user_prompt)
     print()

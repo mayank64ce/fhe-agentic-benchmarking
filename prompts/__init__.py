@@ -1,5 +1,6 @@
 from .task_and import *
 from .task_relu import *
+from .task_transformer import *
 task_and_prompts = {
     'informal': task_prompt,
     '0': task_prompt_formal_0,
@@ -12,4 +13,8 @@ task_and_prompts = {
 task_relu_prompts = {
     'informal': task_prompt_relu,
     '0': task_prompt_relu_formal,
+}
+
+task_transformer_prompts = {
+    '0': task_prompt_formal_transformer,
 }

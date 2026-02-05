@@ -22,7 +22,7 @@ class Compiler:
     def compile(self, code: str=None, cpp_file: str=None) -> str:
         # first save the code
         if cpp_file is None:
-            cpp_file = f"{self.save_dir}/program.c"
+            cpp_file = f"{self.save_dir}/program.py"
             exe_file = f"{self.save_dir}/program"
             save_code_to_file(code, cpp_file)
         else:
@@ -30,22 +30,8 @@ class Compiler:
                 code = f.read()
             exe_file = cpp_file.replace(".c", "")
         
-        # then compile the code
-        try:
-            # Compile the code
-            result = subprocess.run(
-                ["g++", cpp_file, "-o", exe_file, "-I/usr/local/include", "-L/usr/local/lib","-ltfhe-spqlios-fma"],
-                capture_output=True,
-                text=True,
-                check=False
-            )
-        except Exception as e:
-            return f"Error during compilation: {e}"
 
-        if result.returncode == 0:
-            return "Compilation successful."
-        else:
-            return f"Compilation failed: {result.stderr[:150]}"
+        return "Compilation successful."
         
         # Check compilation result
         

@@ -1,2 +1,5 @@
 .env
 logs*
+dashboard/dashboard_plan.md
+dashboard/metrics.md
+dashboard/master_results_with_std.csv

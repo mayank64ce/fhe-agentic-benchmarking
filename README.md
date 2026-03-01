@@ -8,6 +8,25 @@ This repository contains the official implementation for our ICLR 2026 paper:
 
 > **FHE-Bench: Benchmarking LLM Agents for Fully Homomorphic Encryption Code Generation**
 
+> **Can LLMs write correct and secure Fully Homomorphic Encryption (FHE) code?**
+
+This benchmark evaluates large language models on their ability to implement cryptographically correct and secure programs using the [OpenFHE](https://github.com/openfheorganization/openfhe-development) TFHE scheme. We measure both *functional correctness* and *security compliance*, and combine them into a single joint metric: **pass@1(func\_sec)**.
+
+---
+
+## 🏆 Model Leaderboard
+
+Scores are the **weighted average of pass@1(func\_sec) across all 10 tasks**, using the best technique for each task:
+- Simple tasks → **FHE-Coder** (B + Formal Prompt + Security Check + RAG)
+- Complex tasks → **FHE-Coder + Human Guidance** (structured decomposition)
+
+| Rank | Model | Weighted Avg ↓ | Adder | AND | CNN | Dot Product | Mat×Mat | Mat×Vec | MLP | Multiplier | ReLU | Vec Add |
+|------|-------|:--------------:|:-----:|:---:|:---:|:-----------:|:-------:|:-------:|:---:|:----------:|:----:|:-------:|
+| 🥇 1 | **GPT-5** | **0.86** | 1.00 | 1.00 | 0.80 | 0.80 | 0.80 | 0.80 | 0.40 | 1.00 | 1.00 | 1.00 |
+| 🥈 2 | **Gemini-2.5-Pro** | **0.78** | 1.00 | 0.80 | 0.80 | 0.80 | 0.80 | 0.80 | 0.20 | 0.80 | 1.00 | 0.80 |
+| 🥈 2 | **DeepSeek-V3.1** | **0.78** | 1.00 | 0.80 | 0.60 | 0.60 | 0.80 | 0.80 | 0.80 | 0.80 | 0.80 | 0.80 |
+| 4 | **Qwen-2.5-Coder-480B** | **0.50** | 0.80 | 1.00 | 0.20 | 0.40 | 0.20 | 0.40 | 0.00 | 0.80 | 0.80 | 0.40 |
+
 ## Overview
 
 FHE-Bench is a comprehensive benchmark for evaluating the ability of Large Language Model (LLM) agents to generate correct and secure Fully Homomorphic Encryption (FHE) code. The benchmark features:

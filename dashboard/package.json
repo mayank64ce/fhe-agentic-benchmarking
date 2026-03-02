@@ -2,13 +2,13 @@
   "name": "dashboard",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://mayank64ce.github.io/fhe-agentic-benchmarking/",
+  "homepage": "https://fhe-coder.github.io",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
+    "deploy": "gh-pages -d dist -b main -r https://github.com/fhe-coder/fhe-coder.github.io.git",
     "lint": "eslint .",
     "preview": "vite preview"
   },

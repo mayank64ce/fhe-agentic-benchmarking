@@ -237,6 +237,7 @@ function LeaderboardSection({ leaderboard }) {
             <tr>
               <th rowSpan={2}>#</th>
               <th rowSpan={2} style={{ textAlign: 'left' }}>Model</th>
+              <th rowSpan={2} className="avg-th">Avg</th>
               <th
                 colSpan={SIMPLE_TASKS.length}
                 className="group-header simple-group"
@@ -249,7 +250,6 @@ function LeaderboardSection({ leaderboard }) {
               >
                 Complex Tasks
               </th>
-              <th rowSpan={2} className="avg-th">Avg</th>
             </tr>
             <tr>
               {ALL_TASKS.map(t => (
@@ -268,6 +268,12 @@ function LeaderboardSection({ leaderboard }) {
                 <td className="model-td" style={{ color: MODEL_COLOR[row.model] }}>
                   {row.label}
                 </td>
+                <td
+                  className="avg-td score-td"
+                  style={{ background: scoreColor(row.avg), color: scoreFg(row.avg) }}
+                >
+                  <strong>{row.avg.toFixed(2)}</strong>
+                </td>
                 {ALL_TASKS.map(t => {
                   const r = row.tasks[t]
                   const v = r?.score ?? null
@@ -282,12 +288,6 @@ function LeaderboardSection({ leaderboard }) {
                     </td>
                   )
                 })}
-                <td
-                  className="avg-td score-td"
-                  style={{ background: scoreColor(row.avg), color: scoreFg(row.avg) }}
-                >
-                  <strong>{row.avg.toFixed(2)}</strong>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -315,14 +315,17 @@ function SecurityIllusionSection({ idx }) {
     return MODELS.map(model => {
       const blFunc = avgField(idx, model, 'Baseline (B)', 'func')
       const blFuncSec = avgField(idx, model, 'Baseline (B)', 'funcSec')
-      const fhFunc = avgBestFunc(idx, model)
+      const cotFunc = avgField(idx, model, 'Zero-shot COT', 'func')
+      const cotFuncSec = avgField(idx, model, 'Zero-shot COT', 'funcSec')
       const fhFuncSec = avgBestFuncSec(idx, model)
-      return {
+      const entry = {
         name: MODEL_LABEL[model],
         model,
-        Baseline: reveal ? (blFuncSec ?? 0) : (blFunc ?? 0),
-        'FHE-Coder': reveal ? fhFuncSec : fhFunc,
+        BAS: reveal ? (blFuncSec ?? 0) : (blFunc ?? 0),
+        COT: reveal ? (cotFuncSec ?? 0) : (cotFunc ?? 0),
       }
+      if (reveal) entry['FHE-Coder'] = fhFuncSec
+      return entry
     })
   }, [idx, reveal])
 
@@ -352,7 +355,7 @@ function SecurityIllusionSection({ idx }) {
         <div>
           <h2>The Security Illusion</h2>
           <p className="subtitle">
-            Functional tests alone overestimate baseline performance — toggle to reveal the cryptographic security gap.
+            BAS and COT look fine on functional tests — toggle to add security evaluation and reveal FHE-Coder's advantage.
           </p>
         </div>
         <div className="toggle-control">
@@ -361,17 +364,17 @@ function SecurityIllusionSection({ idx }) {
             className={`t-btn ${reveal ? 'on' : 'off'}`}
             onClick={() => setReveal(r => !r)}
             aria-pressed={reveal}
-            aria-label="Reveal security gap"
+            aria-label="Reveal FHE-Coder impact"
           >
             <span className="t-thumb" />
           </button>
-          <span className={`toggle-text ${reveal ? 'active' : ''}`}>Reveal Gap</span>
+          <span className={`toggle-text ${reveal ? 'active' : ''}`}>+ FHE-Coder</span>
         </div>
       </div>
 
       {reveal && (
         <div className="reveal-banner">
-          ⚠ Baselines collapse to near 0% under cryptographic evaluation — FHE-Coder maintains high pass rates.
+          ⚠ BAS and COT collapse under cryptographic evaluation — FHE-Coder maintains high pass rates.
         </div>
       )}
 
@@ -380,7 +383,7 @@ function SecurityIllusionSection({ idx }) {
           <BarChart
             data={chartData}
             margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-            barCategoryGap="30%"
+            barCategoryGap="25%"
             barGap={4}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#1e2a3a" vertical={false} />
@@ -402,12 +405,15 @@ function SecurityIllusionSection({ idx }) {
             <Legend
               wrapperStyle={{ color: '#64748b', paddingTop: 14, fontSize: 13 }}
             />
-            <Bar dataKey="Baseline" fill="#334155" radius={[4, 4, 0, 0]} maxBarSize={54} />
-            <Bar dataKey="FHE-Coder" radius={[4, 4, 0, 0]} maxBarSize={54}>
-              {chartData.map(entry => (
-                <Cell key={entry.model} fill={MODEL_COLOR[entry.model]} />
-              ))}
-            </Bar>
+            <Bar dataKey="BAS" fill="#334155" radius={[4, 4, 0, 0]} maxBarSize={48} />
+            <Bar dataKey="COT" fill="#1e3a5f" radius={[4, 4, 0, 0]} maxBarSize={48} />
+            {reveal && (
+              <Bar dataKey="FHE-Coder" radius={[4, 4, 0, 0]} maxBarSize={48}>
+                {chartData.map(entry => (
+                  <Cell key={entry.model} fill={MODEL_COLOR[entry.model]} />
+                ))}
+              </Bar>
+            )}
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -752,8 +758,8 @@ export default function App() {
       </header>
 
       <main className="main-content">
-        <LeaderboardSection leaderboard={leaderboard} />
         <SecurityIllusionSection idx={idx} />
+        <LeaderboardSection leaderboard={leaderboard} />
         <AblationSection idx={idx} />
         <HeatmapSection leaderboard={leaderboard} />
       </main>

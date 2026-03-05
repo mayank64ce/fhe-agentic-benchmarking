@@ -301,9 +301,9 @@ const TECHNIQUE_OPTIONS = [
 ]
 
 const WEIGHT_DEFS = [
-  { key: 'wFuncSec', label: 'pass@1 (func+sec)', color: '#818cf8' },
-  { key: 'wFunc', label: 'pass@1 (func)', color: '#2dd4bf' },
-  { key: 'wSec', label: 'pass@1 (sec)', color: '#f472b6' },
+  { key: 'wFuncSec', label: 'pass@1 (functionality + security)', color: '#818cf8' },
+  { key: 'wFunc', label: 'pass@1 (functionality)', color: '#2dd4bf' },
+  { key: 'wSec', label: 'pass@1 (security)', color: '#f472b6' },
   { key: 'wLatency', label: 'Latency ratio (lower=better)', color: '#fbbf24' },
 ]
 
@@ -407,10 +407,10 @@ function LeaderboardSection({ idx }) {
               <th>#</th>
               <th style={{ textAlign: 'left' }}>Model</th>
               <th>Overall Score</th>
-              <th>func+sec</th>
-              <th>func</th>
-              <th>sec</th>
-              <th>latency</th>
+              <th>functionality + security</th>
+              <th>functionality</th>
+              <th>security</th>
+              <th>latency ratio</th>
             </tr>
           </thead>
           <tbody>
@@ -495,7 +495,7 @@ function SecurityIllusionSection({ idx }) {
           </div>
         ))}
         <div style={{ marginTop: '0.4rem', fontSize: '0.72rem', color: '#475569' }}>
-          Metric: {reveal ? 'pass@1 (func+sec)' : 'pass@1 (func)'}
+          Metric: {reveal ? 'pass@1 (functionality + security)' : 'pass@1 (functionality)'}
         </div>
       </div>
     )
@@ -507,7 +507,7 @@ function SecurityIllusionSection({ idx }) {
         <div>
           <h2>The Security Illusion</h2>
           <p className="subtitle">
-            BAS and COT look fine on functional tests — toggle to add security evaluation and reveal FHE-Coder's advantage.
+            Baseline and COT look fine on functional tests — toggle to add security evaluation and reveal FHE-Coder's advantage.
           </p>
         </div>
         <div className="toggle-control">
@@ -866,19 +866,19 @@ function HeatmapSection({ leaderboard }) {
 const METRICS_INFO = [
   {
     name: 'pass@1 (functionality)',
-    short: 'func',
+    short: 'functionality',
     color: '#2dd4bf',
     desc: 'Fraction of tasks where the generated code produces correct outputs on all functional test cases. Measures whether the FHE circuit computes the right answer.',
   },
   {
     name: 'pass@1 (security)',
-    short: 'sec',
+    short: 'security',
     color: '#f472b6',
     desc: 'Fraction of tasks where the generated code uses cryptographically valid FHE parameters — correct scheme selection, sufficient noise budget, and proper key configuration.',
   },
   {
-    name: 'pass@1 (func+sec)',
-    short: 'func+sec',
+    name: 'pass@1 (functionality + security)',
+    short: 'functionality + security',
     color: '#818cf8',
     desc: 'The primary benchmark metric. Both functional correctness AND cryptographic security must hold simultaneously. A solution that works but is insecure scores 0.',
   },

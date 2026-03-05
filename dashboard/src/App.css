@@ -94,6 +94,7 @@
   margin-top: 2rem;
   display: flex;
   justify-content: center;
+  gap: 0.75rem;
 }
 
 .gh-btn {
@@ -683,4 +684,245 @@
   .hero-stats {
     gap: 2.5rem;
   }
+}
+
+/* ─── Radio Button Group ─── */
+
+.radio-group {
+  display: flex;
+  gap: 0.35rem;
+  background: #0d1424;
+  border: 1px solid #1e2a3a;
+  border-radius: 8px;
+  padding: 0.25rem;
+  flex-shrink: 0;
+}
+
+.radio-btn {
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.radio-btn:hover {
+  color: #94a3b8;
+  background: #1e2a3a;
+}
+
+.radio-btn.active {
+  background: #1e2a3a;
+  color: #c7d2fe;
+  border: 1px solid #3730a3;
+}
+
+/* ─── Guide Panels ─── */
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.guide-card {
+  background: #0d1424;
+  border: 1px solid #1e2a3a;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.guide-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.guide-badge {
+  padding: 0.18rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.task-badge {
+  background: rgba(129, 140, 248, 0.15);
+  color: #818cf8;
+}
+
+.guide-name {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.guide-desc {
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.tasks-group-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.simple-label { color: #38bdf8; }
+.complex-label { color: #fb923c; }
+
+/* ─── Weight Sliders ─── */
+
+.weight-sliders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.weight-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.weight-slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.weight-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.weight-val {
+  font-size: 0.75rem;
+  font-family: monospace;
+  font-weight: 700;
+}
+
+.weight-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #1e2a3a;
+  outline: none;
+  cursor: pointer;
+}
+
+.weight-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--thumb-color, #818cf8);
+  cursor: pointer;
+  border: 2px solid #0a0f1e;
+  box-shadow: 0 0 0 1px var(--thumb-color, #818cf8);
+}
+
+.weight-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--thumb-color, #818cf8);
+  cursor: pointer;
+  border: 2px solid #0a0f1e;
+}
+
+/* ─── Composite Table ─── */
+
+.composite-table-wrap {
+  overflow-x: auto;
+}
+
+.composite-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.composite-table thead th {
+  padding: 0.5rem 0.75rem;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid #1e2a3a;
+  white-space: nowrap;
+}
+
+.composite-table tbody tr {
+  border-bottom: 1px solid #0f1929;
+}
+
+.composite-table tbody tr:hover {
+  background: #0d1424;
+}
+
+.composite-table td {
+  padding: 0.65rem 0.75rem;
+  vertical-align: middle;
+}
+
+.comp-score-td {
+  min-width: 180px;
+}
+
+.comp-bar-wrap {
+  position: relative;
+  height: 20px;
+  background: #0d1424;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.comp-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: width 0.3s ease;
+}
+
+.comp-bar-label {
+  position: relative;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  padding-left: 0.5rem;
+  z-index: 1;
+}
+
+.comp-metric-td {
+  text-align: center;
+  font-size: 0.8rem;
+  font-family: monospace;
+  white-space: nowrap;
 }

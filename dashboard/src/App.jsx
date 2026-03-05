@@ -41,7 +41,7 @@ const TASK_LABEL = {
   task_multiplier: 'Mult.',
   task_dot_product: 'Dot Prod.',
   task_vector_addition: 'Vec Add',
-  task_cnn: 'CNN',
+  task_cnn: 'Conv',
   task_matrix_matrix: 'Mat×Mat',
   task_matrix_vector: 'Mat×Vec',
   task_mlp: 'MLP',
@@ -178,6 +178,80 @@ function avgBestFuncSec(idx, model) {
   return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0
 }
 
+// Average best-technique sec per model across all tasks
+function avgBestSec(idx, model) {
+  const vals = []
+  for (const task of ALL_TASKS) {
+    const wf = SIMPLE_TASKS.includes(task) ? BEST_SIMPLE_WF : BEST_COMPLEX_WF
+    const e = get(idx, task, model, wf)
+    if (e?.sec != null) vals.push(e.sec)
+  }
+  return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0
+}
+
+// Average best-technique latency per model across all tasks
+function avgBestLatency(idx, model) {
+  const vals = []
+  for (const task of ALL_TASKS) {
+    const wf = SIMPLE_TASKS.includes(task) ? BEST_SIMPLE_WF : BEST_COMPLEX_WF
+    const e = get(idx, task, model, wf)
+    if (e?.latency != null) vals.push(e.latency)
+  }
+  return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null
+}
+
+// Average metrics for a given technique across all tasks
+// technique: 'bas' | 'cot' | 'fhecoder'
+function avgMetricsForTechnique(idx, model, technique) {
+  const funcs = [], secs = [], funcSecs = [], lats = []
+  for (const task of ALL_TASKS) {
+    let e = null
+    if (technique === 'bas') {
+      e = get(idx, task, model, 'Baseline (B)')
+    } else if (technique === 'cot') {
+      e = get(idx, task, model, 'Zero-shot COT')
+    } else {
+      const wf = SIMPLE_TASKS.includes(task) ? BEST_SIMPLE_WF : BEST_COMPLEX_WF
+      e = get(idx, task, model, wf)
+    }
+    if (e?.func != null) funcs.push(e.func)
+    if (e?.sec != null) secs.push(e.sec)
+    if (e?.funcSec != null) funcSecs.push(e.funcSec)
+    if (e?.latency != null) lats.push(e.latency)
+  }
+  const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
+  return {
+    func: avg(funcs),
+    sec: avg(secs),
+    funcSec: avg(funcSecs),
+    latency: lats.length ? avg(lats) : null,
+  }
+}
+
+// Leaderboard for a specific technique: 'bas' | 'cot' | 'fhecoder'
+function computeLeaderboardForTechnique(idx, technique) {
+  const rows = MODELS.map(model => {
+    const tasks = {}
+    for (const task of ALL_TASKS) {
+      let entry = null
+      if (technique === 'bas') {
+        entry = get(idx, task, model, 'Baseline (B)')
+      } else if (technique === 'cot') {
+        entry = get(idx, task, model, 'Zero-shot COT')
+      } else {
+        const r = bestScore(idx, task, model)
+        tasks[task] = r ?? null
+        continue
+      }
+      tasks[task] = entry?.funcSec != null ? { score: entry.funcSec, std: entry.funcSecStd } : null
+    }
+    const valid = Object.values(tasks).filter(Boolean).map(r => r.score)
+    const avg = valid.length ? valid.reduce((a, b) => a + b, 0) / valid.length : 0
+    return { model, label: MODEL_LABEL[model], tasks, avg }
+  })
+  return rows.sort((a, b) => b.avg - a.avg).map((r, i) => ({ ...r, rank: i + 1 }))
+}
+
 // Average best-technique func (not func_sec) per model across all tasks
 function avgBestFunc(idx, model) {
   const vals = []
@@ -220,47 +294,127 @@ function scoreFg(v) {
 
 // ─── Leaderboard ──────────────────────────────────────────────────────────────
 
-function LeaderboardSection({ leaderboard }) {
+const TECHNIQUE_OPTIONS = [
+  { key: 'bas', label: 'BAS', desc: 'Baseline' },
+  { key: 'cot', label: 'COT', desc: 'Zero-shot COT' },
+  { key: 'fhecoder', label: 'FHE-Coder', desc: 'Best technique' },
+]
+
+const WEIGHT_DEFS = [
+  { key: 'wFuncSec', label: 'pass@1 (func+sec)', color: '#818cf8' },
+  { key: 'wFunc', label: 'pass@1 (func)', color: '#2dd4bf' },
+  { key: 'wSec', label: 'pass@1 (sec)', color: '#f472b6' },
+  { key: 'wLatency', label: 'Latency ratio (lower=better)', color: '#fbbf24' },
+]
+
+function WeightSlider({ label, value, onChange, color }) {
+  return (
+    <div className="weight-slider">
+      <div className="weight-slider-header">
+        <span className="weight-label" style={{ color }}>{label}</span>
+        <span className="weight-val" style={{ color }}>{value.toFixed(2)}</span>
+      </div>
+      <input
+        type="range"
+        min={0}
+        max={1}
+        step={0.05}
+        value={value}
+        onChange={e => onChange(parseFloat(e.target.value))}
+        className="weight-range"
+        style={{ '--thumb-color': color, '--track-color': color }}
+      />
+    </div>
+  )
+}
+
+function LeaderboardSection({ idx }) {
+  const [technique, setTechnique] = useState('fhecoder')
+  const [wFuncSec, setWFuncSec] = useState(0.25)
+  const [wFunc, setWFunc] = useState(0.25)
+  const [wSec, setWSec] = useState(0.25)
+  const [wLatency, setWLatency] = useState(0.25)
+
+  const ranked = useMemo(() => {
+    // Get per-model averaged metrics for the selected technique
+    const rows = MODELS.map(model => {
+      const m = avgMetricsForTechnique(idx, model, technique)
+      return { model, label: MODEL_LABEL[model], ...m }
+    })
+
+    // Normalize latency (lower=better → higher score)
+    const validLats = rows.map(r => r.latency).filter(v => v != null)
+    const minLat = Math.min(...validLats)
+    const maxLat = Math.max(...validLats)
+
+    const totalW = wFuncSec + wFunc + wSec + wLatency
+
+    return rows.map(row => {
+      const latScore = row.latency != null && maxLat > minLat
+        ? 1 - (row.latency - minLat) / (maxLat - minLat)
+        : 0.5
+
+      const score = totalW > 0
+        ? (wFuncSec * row.funcSec + wFunc * row.func + wSec * row.sec + wLatency * latScore) / totalW
+        : 0
+
+      return { ...row, latScore, score }
+    }).sort((a, b) => b.score - a.score).map((r, i) => ({ ...r, rank: i + 1 }))
+  }, [idx, technique, wFuncSec, wFunc, wSec, wLatency])
+
+  const setters = { wFuncSec: setWFuncSec, wFunc: setWFunc, wSec: setWSec, wLatency: setWLatency }
+  const values = { wFuncSec, wFunc, wSec, wLatency }
+
   return (
     <section className="card">
       <div className="section-header">
         <div>
           <h2>Leaderboard</h2>
           <p className="subtitle">
-            pass@1(func+sec) — best technique per task, averaged across 10 FHE tasks
+            Averaged across 10 FHE tasks — adjust weights to explore metric priorities.
           </p>
         </div>
+        <div className="radio-group">
+          {TECHNIQUE_OPTIONS.map(opt => (
+            <button
+              key={opt.key}
+              className={`radio-btn ${technique === opt.key ? 'active' : ''}`}
+              onClick={() => setTechnique(opt.key)}
+              title={opt.desc}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="table-scroll">
-        <table className="lb-table">
+
+      <div className="weight-sliders">
+        {WEIGHT_DEFS.map(({ key, label, color }) => (
+          <WeightSlider
+            key={key}
+            label={label}
+            value={values[key]}
+            onChange={setters[key]}
+            color={color}
+          />
+        ))}
+      </div>
+
+      <div className="composite-table-wrap">
+        <table className="composite-table">
           <thead>
             <tr>
-              <th rowSpan={2}>#</th>
-              <th rowSpan={2} style={{ textAlign: 'left' }}>Model</th>
-              <th rowSpan={2} className="avg-th">Avg</th>
-              <th
-                colSpan={SIMPLE_TASKS.length}
-                className="group-header simple-group"
-              >
-                Simple Tasks
-              </th>
-              <th
-                colSpan={COMPLEX_TASKS.length}
-                className="group-header complex-group"
-              >
-                Complex Tasks
-              </th>
-            </tr>
-            <tr>
-              {ALL_TASKS.map(t => (
-                <th key={t} style={{ fontSize: '0.68rem', color: '#475569' }}>
-                  {TASK_LABEL[t]}
-                </th>
-              ))}
+              <th>#</th>
+              <th style={{ textAlign: 'left' }}>Model</th>
+              <th>Overall Score</th>
+              <th>func+sec</th>
+              <th>func</th>
+              <th>sec</th>
+              <th>latency</th>
             </tr>
           </thead>
           <tbody>
-            {leaderboard.map(row => (
+            {ranked.map(row => (
               <tr key={row.model}>
                 <td className="rank-td">
                   <span className={`rank-badge rank-${row.rank}`}>{row.rank}</span>
@@ -268,26 +422,24 @@ function LeaderboardSection({ leaderboard }) {
                 <td className="model-td" style={{ color: MODEL_COLOR[row.model] }}>
                   {row.label}
                 </td>
-                <td
-                  className="avg-td score-td"
-                  style={{ background: scoreColor(row.avg), color: scoreFg(row.avg) }}
-                >
-                  <strong>{row.avg.toFixed(2)}</strong>
+                <td className="comp-score-td">
+                  <div className="comp-bar-wrap">
+                    <div
+                      className="comp-bar"
+                      style={{
+                        width: `${row.score * 100}%`,
+                        background: MODEL_COLOR[row.model],
+                      }}
+                    />
+                    <span className="comp-bar-label">{row.score.toFixed(3)}</span>
+                  </div>
                 </td>
-                {ALL_TASKS.map(t => {
-                  const r = row.tasks[t]
-                  const v = r?.score ?? null
-                  return (
-                    <td
-                      key={t}
-                      className="score-td"
-                      style={{ background: scoreColor(v), color: scoreFg(v) }}
-                      title={`${MODEL_LABEL[row.model]} × ${TASK_LABEL[t]}: ${v != null ? (v * 100).toFixed(0) + '%' : 'N/A'}`}
-                    >
-                      {v != null ? v.toFixed(2) : '–'}
-                    </td>
-                  )
-                })}
+                <td className="comp-metric-td" style={{ color: '#818cf8' }}>{row.funcSec.toFixed(2)}</td>
+                <td className="comp-metric-td" style={{ color: '#2dd4bf' }}>{row.func.toFixed(2)}</td>
+                <td className="comp-metric-td" style={{ color: '#f472b6' }}>{row.sec.toFixed(2)}</td>
+                <td className="comp-metric-td" style={{ color: '#fbbf24' }}>
+                  {row.latency != null ? `${row.latency.toFixed(2)}×` : '–'}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -707,6 +859,123 @@ function HeatmapSection({ leaderboard }) {
   )
 }
 
+
+
+// ─── Metrics Guide ───────────────────────────────────────────────────────────
+
+const METRICS_INFO = [
+  {
+    name: 'pass@1 (functionality)',
+    short: 'func',
+    color: '#2dd4bf',
+    desc: 'Fraction of tasks where the generated code produces correct outputs on all functional test cases. Measures whether the FHE circuit computes the right answer.',
+  },
+  {
+    name: 'pass@1 (security)',
+    short: 'sec',
+    color: '#f472b6',
+    desc: 'Fraction of tasks where the generated code uses cryptographically valid FHE parameters — correct scheme selection, sufficient noise budget, and proper key configuration.',
+  },
+  {
+    name: 'pass@1 (func+sec)',
+    short: 'func+sec',
+    color: '#818cf8',
+    desc: 'The primary benchmark metric. Both functional correctness AND cryptographic security must hold simultaneously. A solution that works but is insecure scores 0.',
+  },
+  {
+    name: 'Latency Ratio',
+    short: 'latency',
+    color: '#fbbf24',
+    desc: 'Runtime of the generated FHE code relative to an expert-written reference solution. A value of 1.0× means on par with the expert; higher values indicate slower code. Lower is better.',
+  },
+]
+
+function MetricsGuideSection() {
+  return (
+    <section className="card">
+      <div className="section-header">
+        <div>
+          <h2>Metric Definitions</h2>
+          <p className="subtitle">
+            What each evaluation metric measures and why it matters for FHE code generation.
+          </p>
+        </div>
+      </div>
+      <div className="guide-grid">
+        {METRICS_INFO.map(m => (
+          <div key={m.short} className="guide-card" style={{ borderColor: m.color + '40' }}>
+            <div className="guide-card-header">
+              <span className="guide-badge" style={{ background: m.color + '20', color: m.color }}>
+                {m.short}
+              </span>
+              <span className="guide-name">{m.name}</span>
+            </div>
+            <p className="guide-desc">{m.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+// ─── Tasks Guide ─────────────────────────────────────────────────────────────
+
+const TASKS_INFO = {
+  simple: [
+    { task: 'task_adder', desc: 'Add two encrypted integers using FHE arithmetic circuits.' },
+    { task: 'task_and', desc: 'Compute bitwise AND on encrypted bits via Boolean FHE gates.' },
+    { task: 'task_relu', desc: 'Apply ReLU activation (max(0, x)) to an encrypted value using polynomial approximation.' },
+    { task: 'task_multiplier', desc: 'Multiply two encrypted integers; tests ciphertext multiplication and noise management.' },
+    { task: 'task_dot_product', desc: 'Compute the dot product of two encrypted vectors using SIMD batching.' },
+    { task: 'task_vector_addition', desc: 'Element-wise addition of two encrypted vectors.' },
+  ],
+  complex: [
+    { task: 'task_cnn', desc: 'Apply a 2D convolution operation over an encrypted input sequence.' },
+    { task: 'task_matrix_matrix', desc: 'Multiply two encrypted matrices; requires correct rotation and accumulation patterns.' },
+    { task: 'task_matrix_vector', desc: 'Multiply an encrypted matrix by an encrypted vector using diagonal encoding.' },
+    { task: 'task_mlp', desc: 'Run inference of a multi-layer perceptron over encrypted inputs end-to-end.' },
+  ],
+}
+
+function TasksGuideSection() {
+  return (
+    <section className="card">
+      <div className="section-header">
+        <div>
+          <h2>Task Descriptions</h2>
+          <p className="subtitle">
+            Brief overview of the 10 FHE programming tasks in the benchmark.
+          </p>
+        </div>
+      </div>
+
+      <div className="tasks-group-label simple-label">Simple Tasks</div>
+      <div className="guide-grid">
+        {TASKS_INFO.simple.map(({ task, desc }) => (
+          <div key={task} className="guide-card task-card">
+            <div className="guide-card-header">
+              <span className="guide-badge task-badge">{TASK_LABEL[task]}</span>
+            </div>
+            <p className="guide-desc">{desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="tasks-group-label complex-label" style={{ marginTop: '1.5rem' }}>Complex Tasks</div>
+      <div className="guide-grid">
+        {TASKS_INFO.complex.map(({ task, desc }) => (
+          <div key={task} className="guide-card task-card">
+            <div className="guide-card-header">
+              <span className="guide-badge task-badge">{TASK_LABEL[task]}</span>
+            </div>
+            <p className="guide-desc">{desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -743,6 +1012,17 @@ export default function App() {
           </div>
           <div className="hero-actions">
             <a
+              href="https://openreview.net/forum?id=4F1py5vQXm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="gh-btn"
+            >
+              <svg className="gh-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z" />
+              </svg>
+              Paper
+            </a>
+            <a
               href="https://github.com/mayank64ce/fhe-agentic-benchmarking"
               target="_blank"
               rel="noopener noreferrer"
@@ -758,10 +1038,10 @@ export default function App() {
       </header>
 
       <main className="main-content">
+        <LeaderboardSection idx={idx} />
         <SecurityIllusionSection idx={idx} />
-        <LeaderboardSection leaderboard={leaderboard} />
-        <AblationSection idx={idx} />
-        <HeatmapSection leaderboard={leaderboard} />
+        <MetricsGuideSection />
+        <TasksGuideSection />
       </main>
 
       <footer className="footer">

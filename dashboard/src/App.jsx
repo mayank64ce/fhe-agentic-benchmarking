@@ -49,6 +49,8 @@ const TASK_LABEL = {
 
 const MODELS = [
   'GPT-5',
+  'GLM-4.5-Air',
+  'Claude-Sonnet-4.6',
   'Gemini-2.5-pro',
   'Deepseek-Chat-V3.1',
   'Qwen-3-Coder-480B-A35B',
@@ -56,6 +58,8 @@ const MODELS = [
 
 const MODEL_LABEL = {
   'GPT-5': 'GPT-5',
+  'GLM-4.5-Air': 'GLM-4.5-Air',
+  'Claude-Sonnet-4.6': 'Claude-Sonnet-4.6',
   'Gemini-2.5-pro': 'Gemini-2.5-Pro',
   'Deepseek-Chat-V3.1': 'DeepSeek-V3.1',
   'Qwen-3-Coder-480B-A35B': 'Qwen-2.5-Coder-480B',
@@ -63,6 +67,8 @@ const MODEL_LABEL = {
 
 const MODEL_COLOR = {
   'GPT-5': '#818cf8',
+  'GLM-4.5-Air': '#34d399',
+  'Claude-Sonnet-4.6': '#f97316',
   'Gemini-2.5-pro': '#f472b6',
   'Deepseek-Chat-V3.1': '#2dd4bf',
   'Qwen-3-Coder-480B-A35B': '#fbbf24',

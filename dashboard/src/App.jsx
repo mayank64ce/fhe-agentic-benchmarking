@@ -48,29 +48,41 @@ const TASK_LABEL = {
 }
 
 const MODELS = [
+  'Claude-Opus-4.6',
+  'GPT-5.4',
   'GPT-5',
   'GLM-4.5-Air',
   'Claude-Sonnet-4.6',
   'Gemini-2.5-pro',
   'Deepseek-Chat-V3.1',
+  'Llama-4-Maverick',
+  'Mistral-Large-2',
   'Qwen-3-Coder-480B-A35B',
 ]
 
 const MODEL_LABEL = {
+  'Claude-Opus-4.6': 'Claude-Opus-4.6',
+  'GPT-5.4': 'GPT-5.4',
   'GPT-5': 'GPT-5',
   'GLM-4.5-Air': 'GLM-4.5-Air',
   'Claude-Sonnet-4.6': 'Claude-Sonnet-4.6',
   'Gemini-2.5-pro': 'Gemini-2.5-Pro',
   'Deepseek-Chat-V3.1': 'DeepSeek-V3.1',
+  'Llama-4-Maverick': 'Llama-4-Maverick',
+  'Mistral-Large-2': 'Mistral-Large-2',
   'Qwen-3-Coder-480B-A35B': 'Qwen-2.5-Coder-480B',
 }
 
 const MODEL_COLOR = {
+  'Claude-Opus-4.6': '#e879f9',
+  'GPT-5.4': '#60a5fa',
   'GPT-5': '#818cf8',
   'GLM-4.5-Air': '#34d399',
   'Claude-Sonnet-4.6': '#f97316',
   'Gemini-2.5-pro': '#f472b6',
   'Deepseek-Chat-V3.1': '#2dd4bf',
+  'Llama-4-Maverick': '#fb923c',
+  'Mistral-Large-2': '#a3e635',
   'Qwen-3-Coder-480B-A35B': '#fbbf24',
 }
 
@@ -130,14 +142,18 @@ function buildIndex(rows) {
       e.latency = row.value
     }
   }
-  // Compute func_sec for every entry
+  // Compute func_sec and f1 for every entry
   for (const e of idx.values()) {
     if (e.func != null && e.sec != null) {
       e.funcSec = Math.min(e.func, e.sec)
       e.funcSecStd = e.func <= e.sec ? e.funcStd : e.secStd
+      e.f1 = (e.func + e.sec) > 0
+        ? 2 * (e.func * e.sec) / (e.func + e.sec)
+        : 0
     } else {
       e.funcSec = null
       e.funcSecStd = null
+      e.f1 = null
     }
   }
   return idx
@@ -209,7 +225,7 @@ function avgBestLatency(idx, model) {
 // Average metrics for a given technique across all tasks
 // technique: 'bas' | 'cot' | 'fhecoder'
 function avgMetricsForTechnique(idx, model, technique) {
-  const funcs = [], secs = [], funcSecs = [], lats = []
+  const funcs = [], secs = [], funcSecs = [], f1s = [], lats = []
   for (const task of ALL_TASKS) {
     let e = null
     if (technique === 'bas') {
@@ -223,6 +239,7 @@ function avgMetricsForTechnique(idx, model, technique) {
     if (e?.func != null) funcs.push(e.func)
     if (e?.sec != null) secs.push(e.sec)
     if (e?.funcSec != null) funcSecs.push(e.funcSec)
+    if (e?.f1 != null) f1s.push(e.f1)
     if (e?.latency != null) lats.push(e.latency)
   }
   const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
@@ -230,6 +247,7 @@ function avgMetricsForTechnique(idx, model, technique) {
     func: avg(funcs),
     sec: avg(secs),
     funcSec: avg(funcSecs),
+    f1: avg(f1s),
     latency: lats.length ? avg(lats) : null,
   }
 }
@@ -301,8 +319,8 @@ function scoreFg(v) {
 // ─── Leaderboard ──────────────────────────────────────────────────────────────
 
 const TECHNIQUE_OPTIONS = [
-  { key: 'bas', label: 'BAS', desc: 'Baseline' },
-  { key: 'cot', label: 'COT', desc: 'Zero-shot COT' },
+  { key: 'bas', label: 'Baseline', desc: 'Baseline' },
+  { key: 'cot', label: 'Zero-Shot Chain of Thought', desc: 'Zero-shot COT' },
   { key: 'fhecoder', label: 'FHE-Coder', desc: 'Best technique' },
 ]
 
@@ -328,82 +346,157 @@ function WeightSlider({ label, value, onChange, color }) {
         value={value}
         onChange={e => onChange(parseFloat(e.target.value))}
         className="weight-range"
-        style={{ '--thumb-color': color, '--track-color': color }}
+        style={{
+          '--thumb-color': color,
+          '--track-color': color,
+          '--fill-pct': `${value * 100}%`,
+        }}
       />
+      <span className="slider-hint">drag to adjust weight</span>
     </div>
   )
 }
 
+function FHEExplanationSection() {
+  return (
+    <section className="fhe-explanation">
+      <div className="explanation-container">
+        <h2>Why FHE Coding is Hard?</h2>
+        <p className="explanation-intro">
+          Fully Homomorphic Encryption (FHE) requires computing on encrypted data. Unlike regular programming, FHE code must handle encryption, homomorphic operations, and decryption — without ever exposing the plaintext.
+        </p>
+
+        <div className="code-comparison">
+          <div className="code-column plaintext">
+            <h3>Standard Code</h3>
+            <div className="code-block">
+              <span className="code-comment">// No encryption overhead</span><br />
+              <span className="code-keyword">int</span> result = a & b;
+            </div>
+            <p className="code-label">Simple & Direct</p>
+          </div>
+
+          <div className="code-column tfhe">
+            <h3>FHE Code (TFHE)</h3>
+            <div className="code-block">
+              <div className="annotation-group">
+                <span className="annotation-label">🔧 Parameter Setup &amp; Key Generation</span>
+                <span className="code-keyword">const int</span> minimum_lambda = <span className="code-number">110</span>;<br />
+                TFheGateBootstrappingParameterSet* params =<br />
+                &nbsp;&nbsp;new_default_gate_bootstrapping_parameters(minimum_lambda);<br />
+                uint32_t seed[] = &#123; <span className="code-number">314, 1592, 657</span> &#125;;<br />
+                tfhe_random_generator_setSeed(seed, <span className="code-number">3</span>);<br />
+                TFheGateBootstrappingSecretKeySet* key =<br />
+                &nbsp;&nbsp;new_random_gate_bootstrapping_secret_keyset(params);
+              </div>
+
+              <div className="annotation-group">
+                <span className="annotation-label">🔐 Encryption of Input</span>
+                <span className="code-keyword">LweSample</span>* ciphertext1 = new_gate_bootstrapping_ciphertext_array(<span className="code-number">32</span>, params);<br />
+                <span className="code-keyword">for</span> (<span className="code-keyword">int</span> i=<span className="code-number">0</span>; i &lt; <span className="code-number">32</span>; i++) &#123;<br />
+                &nbsp;&nbsp;bootsSymEncrypt(&amp;ciphertext1[i], (plaintext1 &gt;&gt; i) &amp; <span className="code-number">1</span>, key);<br />
+                &#125;
+              </div>
+
+              <div className="annotation-group">
+                <span className="annotation-label">⚙️ Homomorphic Operation</span>
+                <span className="code-keyword">LweSample</span>* result = new_gate_bootstrapping_ciphertext_array(<span className="code-number">32</span>, params);<br />
+                <span className="code-keyword">for</span> (<span className="code-keyword">int</span> i=<span className="code-number">0</span>; i &lt; <span className="code-number">32</span>; i++) &#123;<br />
+                &nbsp;&nbsp;bootsAND(&amp;result[i], &amp;ciphertext1[i], &amp;ciphertext2[i], key-&gt;cloud);<br />
+                &#125;
+              </div>
+
+              <div className="annotation-group">
+                <span className="annotation-label">🔓 Decryption of Output</span>
+                <span className="code-keyword">int32_t</span> decrypted_result = <span className="code-number">0</span>;<br />
+                <span className="code-keyword">for</span> (<span className="code-keyword">int</span> i=<span className="code-number">0</span>; i &lt; <span className="code-number">32</span>; i++) &#123;<br />
+                &nbsp;&nbsp;decrypted_result |= (bootsSymDecrypt(&amp;result[i], key-&gt;lwe_key) &lt;&lt; i);<br />
+                &#125;
+              </div>
+            </div>
+            <p className="code-label">Complex & Crypto-Aware</p>
+          </div>
+        </div>
+
+        <div className="explanation-insight">
+          <strong>The Challenge:</strong> LLMs must generate code that correctly uses FHE libraries, manages encrypted values, and produces valid outputs — all while respecting cryptographic constraints.
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const SORT_OPTIONS = [
+  { key: 'f1',      label: 'F1 Score',        color: '#a78bfa' },
+  { key: 'funcSec', label: 'Func + Security', color: '#818cf8' },
+  { key: 'func',    label: 'Functionality',   color: '#2dd4bf' },
+  { key: 'sec',     label: 'Security',        color: '#f472b6' },
+  { key: 'latency', label: 'Latency',         color: '#fbbf24' },
+]
+
 function LeaderboardSection({ idx }) {
   const [technique, setTechnique] = useState('fhecoder')
-  const [wFuncSec, setWFuncSec] = useState(0.25)
-  const [wFunc, setWFunc] = useState(0.25)
-  const [wSec, setWSec] = useState(0.25)
-  const [wLatency, setWLatency] = useState(0.25)
+  const [sortBy, setSortBy] = useState('funcSec')
 
   const ranked = useMemo(() => {
-    // Get per-model averaged metrics for the selected technique
     const rows = MODELS.map(model => {
       const m = avgMetricsForTechnique(idx, model, technique)
       return { model, label: MODEL_LABEL[model], ...m }
     })
 
-    // Normalize latency (lower=better → higher score)
-    const validLats = rows.map(r => r.latency).filter(v => v != null)
-    const minLat = Math.min(...validLats)
-    const maxLat = Math.max(...validLats)
+    return [...rows].sort((a, b) => {
+      if (sortBy === 'latency') {
+        const av = a.latency ?? Infinity
+        const bv = b.latency ?? Infinity
+        return av - bv  // lower latency is better
+      }
+      return (b[sortBy] ?? 0) - (a[sortBy] ?? 0)
+    }).map((r, i) => ({ ...r, rank: i + 1 }))
+  }, [idx, technique, sortBy])
 
-    const totalW = wFuncSec + wFunc + wSec + wLatency
-
-    return rows.map(row => {
-      const latScore = row.latency != null && maxLat > minLat
-        ? 1 - (row.latency - minLat) / (maxLat - minLat)
-        : 0.5
-
-      const score = totalW > 0
-        ? (wFuncSec * row.funcSec + wFunc * row.func + wSec * row.sec + wLatency * latScore) / totalW
-        : 0
-
-      return { ...row, latScore, score }
-    }).sort((a, b) => b.score - a.score).map((r, i) => ({ ...r, rank: i + 1 }))
-  }, [idx, technique, wFuncSec, wFunc, wSec, wLatency])
-
-  const setters = { wFuncSec: setWFuncSec, wFunc: setWFunc, wSec: setWSec, wLatency: setWLatency }
-  const values = { wFuncSec, wFunc, wSec, wLatency }
+  const activeSortColor = SORT_OPTIONS.find(o => o.key === sortBy)?.color ?? '#818cf8'
 
   return (
     <section className="card">
-      <div className="section-header">
-        <div>
-          <h2>Leaderboard</h2>
-          <p className="subtitle">
-            Averaged across 10 FHE tasks — adjust weights to explore metric priorities.
-          </p>
+      <div className="lb-header">
+        <div className="lb-title-row">
+          <div>
+            <h2>Leaderboard</h2>
+            <p className="subtitle">Averaged across 10 FHE tasks.</p>
+          </div>
         </div>
-        <div className="radio-group">
-          {TECHNIQUE_OPTIONS.map(opt => (
-            <button
-              key={opt.key}
-              className={`radio-btn ${technique === opt.key ? 'active' : ''}`}
-              onClick={() => setTechnique(opt.key)}
-              title={opt.desc}
-            >
-              {opt.label}
-            </button>
-          ))}
+        <div className="lb-controls-row">
+          <div className="lb-sort-row">
+            <span className="technique-label">Sort by:</span>
+            <div className="radio-group">
+              {SORT_OPTIONS.map(opt => (
+                <button
+                  key={opt.key}
+                  className={`radio-btn ${sortBy === opt.key ? 'active' : ''}`}
+                  onClick={() => setSortBy(opt.key)}
+                  style={sortBy === opt.key ? { borderColor: opt.color, color: opt.color } : {}}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="lb-sort-row">
+            <span className="technique-label">Agent Type:</span>
+            <div className="radio-group">
+              {TECHNIQUE_OPTIONS.map(opt => (
+                <button
+                  key={opt.key}
+                  className={`radio-btn ${technique === opt.key ? 'active' : ''}`}
+                  onClick={() => setTechnique(opt.key)}
+                  title={opt.desc}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className="weight-sliders">
-        {WEIGHT_DEFS.map(({ key, label, color }) => (
-          <WeightSlider
-            key={key}
-            label={label}
-            value={values[key]}
-            onChange={setters[key]}
-            color={color}
-          />
-        ))}
       </div>
 
       <div className="composite-table-wrap">
@@ -412,42 +505,56 @@ function LeaderboardSection({ idx }) {
             <tr>
               <th>#</th>
               <th style={{ textAlign: 'left' }}>Model</th>
-              <th>Overall Score</th>
-              <th>functionality + security</th>
-              <th>functionality</th>
-              <th>security</th>
-              <th>latency ratio</th>
+              <th style={{ color: activeSortColor }}>
+                {SORT_OPTIONS.find(o => o.key === sortBy)?.label}
+                {sortBy === 'latency' ? ' ↑ lower is better' : ' ↓ higher is better'}
+              </th>
+              <th style={{ color: '#a78bfa' }}>F1 Score</th>
+              <th>Func + Security</th>
+              <th>Functionality</th>
+              <th>Security</th>
+              <th>Latency Ratio</th>
             </tr>
           </thead>
           <tbody>
-            {ranked.map(row => (
-              <tr key={row.model}>
-                <td className="rank-td">
-                  <span className={`rank-badge rank-${row.rank}`}>{row.rank}</span>
-                </td>
-                <td className="model-td" style={{ color: MODEL_COLOR[row.model] }}>
-                  {row.label}
-                </td>
-                <td className="comp-score-td">
-                  <div className="comp-bar-wrap">
-                    <div
-                      className="comp-bar"
-                      style={{
-                        width: `${row.score * 100}%`,
-                        background: MODEL_COLOR[row.model],
-                      }}
-                    />
-                    <span className="comp-bar-label">{row.score.toFixed(3)}</span>
-                  </div>
-                </td>
-                <td className="comp-metric-td" style={{ color: '#818cf8' }}>{row.funcSec.toFixed(2)}</td>
-                <td className="comp-metric-td" style={{ color: '#2dd4bf' }}>{row.func.toFixed(2)}</td>
-                <td className="comp-metric-td" style={{ color: '#f472b6' }}>{row.sec.toFixed(2)}</td>
-                <td className="comp-metric-td" style={{ color: '#fbbf24' }}>
-                  {row.latency != null ? `${row.latency.toFixed(2)}×` : '–'}
-                </td>
-              </tr>
-            ))}
+            {ranked.map(row => {
+              const sortVal = sortBy === 'latency'
+                ? (row.latency != null ? row.latency : null)
+                : (row[sortBy] ?? null)
+              const barPct = sortBy === 'latency'
+                ? null  // don't show bar for latency
+                : (sortVal != null ? sortVal * 100 : 0)
+
+              return (
+                <tr key={row.model}>
+                  <td className="rank-td">
+                    <span className={`rank-badge rank-${Math.min(row.rank, 4)}`}>{row.rank}</span>
+                  </td>
+                  <td className="model-td" style={{ color: MODEL_COLOR[row.model] }}>
+                    {row.label}
+                  </td>
+                  <td className="comp-score-td">
+                    {barPct != null ? (
+                      <div className="comp-bar-wrap">
+                        <div className="comp-bar" style={{ width: `${barPct}%`, background: MODEL_COLOR[row.model] }} />
+                        <span className="comp-bar-label">{sortVal.toFixed(2)}</span>
+                      </div>
+                    ) : (
+                      <span className="comp-metric-td" style={{ color: '#fbbf24' }}>
+                        {row.latency != null ? `${row.latency.toFixed(2)}×` : '–'}
+                      </span>
+                    )}
+                  </td>
+                  <td className="comp-metric-td" style={{ color: '#a78bfa' }}>{row.f1.toFixed(2)}</td>
+                  <td className="comp-metric-td" style={{ color: '#818cf8' }}>{row.funcSec.toFixed(2)}</td>
+                  <td className="comp-metric-td" style={{ color: '#2dd4bf' }}>{row.func.toFixed(2)}</td>
+                  <td className="comp-metric-td" style={{ color: '#f472b6' }}>{row.sec.toFixed(2)}</td>
+                  <td className="comp-metric-td" style={{ color: '#fbbf24' }}>
+                    {row.latency != null ? `${row.latency.toFixed(2)}×` : '–'}
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
@@ -479,8 +586,8 @@ function SecurityIllusionSection({ idx }) {
       const entry = {
         name: MODEL_LABEL[model],
         model,
-        BAS: reveal ? (blFuncSec ?? 0) : (blFunc ?? 0),
-        COT: reveal ? (cotFuncSec ?? 0) : (cotFunc ?? 0),
+        Baseline: reveal ? (blFuncSec ?? 0) : (blFunc ?? 0),
+        'Zero-Shot Chain of Thought': reveal ? (cotFuncSec ?? 0) : (cotFunc ?? 0),
       }
       if (reveal) entry['FHE-Coder'] = fhFuncSec
       return entry
@@ -513,7 +620,7 @@ function SecurityIllusionSection({ idx }) {
         <div>
           <h2>The Security Illusion</h2>
           <p className="subtitle">
-            Baseline and COT look fine on functional tests — toggle to add security evaluation and reveal FHE-Coder's advantage.
+            Baseline and Zero-Shot Chain of Thought look fine on functional tests — toggle to add security evaluation and reveal FHE-Coder's advantage.
           </p>
         </div>
         <div className="toggle-control">
@@ -532,7 +639,7 @@ function SecurityIllusionSection({ idx }) {
 
       {reveal && (
         <div className="reveal-banner">
-          ⚠ BAS and COT collapse under cryptographic evaluation — FHE-Coder maintains high pass rates.
+          ⚠ Baseline and Zero-Shot Chain of Thought collapse under cryptographic evaluation — FHE-Coder maintains high pass rates.
         </div>
       )}
 
@@ -563,8 +670,8 @@ function SecurityIllusionSection({ idx }) {
             <Legend
               wrapperStyle={{ color: '#64748b', paddingTop: 14, fontSize: 13 }}
             />
-            <Bar dataKey="BAS" fill="#334155" radius={[4, 4, 0, 0]} maxBarSize={48} />
-            <Bar dataKey="COT" fill="#1e3a5f" radius={[4, 4, 0, 0]} maxBarSize={48} />
+            <Bar dataKey="Baseline" fill="#334155" radius={[4, 4, 0, 0]} maxBarSize={48} />
+            <Bar dataKey="Zero-Shot Chain of Thought" fill="#1e3a5f" radius={[4, 4, 0, 0]} maxBarSize={48} />
             {reveal && (
               <Bar dataKey="FHE-Coder" radius={[4, 4, 0, 0]} maxBarSize={48}>
                 {chartData.map(entry => (
@@ -871,6 +978,12 @@ function HeatmapSection({ leaderboard }) {
 
 const METRICS_INFO = [
   {
+    name: 'F1 Score',
+    short: 'f1',
+    color: '#a78bfa',
+    desc: 'Harmonic mean of functionality and security pass rates: 2 × (func × sec) / (func + sec). Rewards balanced performance — a model scoring 0 on either metric gets F1 = 0. Penalizes models that are strong on one axis but weak on the other.',
+  },
+  {
     name: 'pass@1 (functionality)',
     short: 'functionality',
     color: '#2dd4bf',
@@ -886,7 +999,7 @@ const METRICS_INFO = [
     name: 'pass@1 (functionality + security)',
     short: 'functionality + security',
     color: '#818cf8',
-    desc: 'The primary benchmark metric. Both functional correctness AND cryptographic security must hold simultaneously. A solution that works but is insecure scores 0.',
+    desc: 'Both functional correctness AND cryptographic security must hold simultaneously. Equivalent to min(func, sec) — a solution that works but is insecure scores 0.',
   },
   {
     name: 'Latency Ratio',
@@ -985,6 +1098,8 @@ function TasksGuideSection() {
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
+  const [theme, setTheme] = useState('dark')
+
   const { idx, leaderboard } = useMemo(() => {
     const rows = parseCSV(csvText)
     const idx = buildIndex(rows)
@@ -992,19 +1107,26 @@ export default function App() {
     return { idx, leaderboard }
   }, [])
 
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark')
+  }
+
   return (
-    <div>
+    <div className={`app-${theme}`}>
       <header className="hero">
+        <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
         <div className="hero-content">
-          <div className="hero-badge">Research Benchmark</div>
-          <h1>FHE-Coder Dashboard</h1>
+          {/* <div className="hero-badge">Research Benchmark</div> */}
+          <h1>FHE-Coder Leaderboard</h1>
           <p className="hero-desc">
             Benchmarking LLM-driven Fully Homomorphic Encryption code generation across
             functional correctness and cryptographic security constraints.
           </p>
           <div className="hero-stats">
             <div className="stat">
-              <span className="stat-num">4</span>
+              <span className="stat-num">{MODELS.length}</span>
               <span className="stat-label">Models</span>
             </div>
             <div className="stat">
@@ -1044,6 +1166,7 @@ export default function App() {
       </header>
 
       <main className="main-content">
+        <FHEExplanationSection />
         <LeaderboardSection idx={idx} />
         <SecurityIllusionSection idx={idx} />
         <MetricsGuideSection />

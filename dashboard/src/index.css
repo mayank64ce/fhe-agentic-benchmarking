@@ -1,3 +1,13 @@
+:root {
+  --bg-primary: #0a0f1e;
+  --bg-secondary: #111827;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --border-color: #1e2a3a;
+  --card-bg: #111827;
+  --accent: #818cf8;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -12,9 +22,40 @@ body {
   min-width: 320px;
   min-height: 100vh;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #0a0f1e;
-  color: #e2e8f0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.app-light {
+  color: #0f172a;
+}
+
+.app-light .hero-desc,
+.app-light .explanation-intro,
+.app-light .code-label {
+  color: #1e293b;
+}
+
+.app-light .code-comment {
+  color: #475569;
+}
+
+.app-light .section-title,
+.app-light .fhe-explanation h2,
+.app-light .code-column h3 {
+  color: #0f172a;
+}
+
+.app-light .explanation-insight {
+  background: rgba(79, 70, 229, 0.08);
+  border-left-color: #4f46e5;
+  color: #1e293b;
+}
+
+.app-light .explanation-insight strong {
+  color: #3730a3;
 }
 
 #root {
